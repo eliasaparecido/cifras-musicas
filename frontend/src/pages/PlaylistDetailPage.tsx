@@ -22,6 +22,8 @@ export default function PlaylistDetailPage() {
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [showPreview, setShowPreview] = useState(false);
+  const [editingKey, setEditingKey] = useState<string | null>(null);
+  const [tempKey, setTempKey] = useState('');
 
   useEffect(() => {
     loadData();
@@ -73,6 +75,20 @@ export default function PlaylistDetailPage() {
     } catch (error) {
       console.error('Erro ao remover música:', error);
       alert('Erro ao remover música');
+    }
+  };
+
+  const handleUpdateKey = async (songId: string, newKey: string) => {
+    if (!id || !newKey) return;
+
+    try {
+      await playlistService.updateSong(id, songId, { key: newKey });
+      await loadData();
+      setEditingKey(null);
+      setTempKey('');
+    } catch (error) {
+      console.error('Erro ao atualizar tom:', error);
+      alert('Erro ao atualizar tom');
     }
   };
 
@@ -330,9 +346,50 @@ export default function PlaylistDetailPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
-                    <span className="text-sm bg-blue-100 text-blue-800 px-3 py-1 rounded">
-                      Tom: {playlistSong.key}
-                    </span>
+                    {editingKey === playlistSong.id ? (
+                      <div className="flex items-center gap-2">
+                        <select
+                          value={tempKey}
+                          onChange={(e) => setTempKey(e.target.value)}
+                          className="text-sm border rounded px-2 py-1"
+                          autoFocus
+                        >
+                          {ALL_KEYS.map((key) => (
+                            <option key={key} value={key}>
+                              {key}
+                            </option>
+                          ))}
+                        </select>
+                        <button
+                          onClick={() => handleUpdateKey(playlistSong.songId, tempKey)}
+                          className="text-green-600 hover:text-green-700 font-bold text-xl"
+                          title="Salvar"
+                        >
+                          ✓
+                        </button>
+                        <button
+                          onClick={() => {
+                            setEditingKey(null);
+                            setTempKey('');
+                          }}
+                          className="text-gray-500 hover:text-gray-700 font-bold"
+                          title="Cancelar"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => {
+                          setEditingKey(playlistSong.id);
+                          setTempKey(playlistSong.key);
+                        }}
+                        className="text-sm bg-blue-100 text-blue-800 px-3 py-1 rounded hover:bg-blue-200 transition-colors cursor-pointer"
+                        title="Clique para editar o tom"
+                      >
+                        Tom: {playlistSong.key} ✏️
+                      </button>
+                    )}
                     <button
                       onClick={() => handleRemoveSong(playlistSong.songId)}
                       className="text-red-500 hover:text-red-700 font-bold"
