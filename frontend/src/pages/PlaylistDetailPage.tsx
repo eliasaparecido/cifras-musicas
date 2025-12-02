@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { playlistService } from '../services/playlistService';
 import { songService } from '../services/songService';
 import { Playlist, Song, PlaylistSong } from '../types';
+import PlaylistPreviewModal from '../components/PlaylistPreviewModal';
 
 const KEYS = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 const MINOR_KEYS = KEYS.map(k => k + 'm');
@@ -20,6 +21,7 @@ export default function PlaylistDetailPage() {
   const [generatingPDF, setGeneratingPDF] = useState(false);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [showPreview, setShowPreview] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -173,6 +175,13 @@ export default function PlaylistDetailPage() {
             )}
           </div>
           <div className="flex gap-2">
+            <button
+              onClick={() => setShowPreview(true)}
+              disabled={playlist.songs.length === 0}
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
+            >
+              👁️ Visualizar
+            </button>
             <button
               onClick={handleGeneratePDF}
               disabled={generatingPDF || playlist.songs.length === 0}
@@ -336,6 +345,14 @@ export default function PlaylistDetailPage() {
           </div>
         )}
       </div>
+
+      {/* Modal de Visualização */}
+      {showPreview && playlist && (
+        <PlaylistPreviewModal
+          playlist={playlist}
+          onClose={() => setShowPreview(false)}
+        />
+      )}
     </div>
   );
 }

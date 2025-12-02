@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, List as ListIcon, FileDown, Search } from 'lucide-react';
+import { Plus, List as ListIcon, FileDown, Search, Eye } from 'lucide-react';
 import { playlistService } from '../services/playlistService';
 import { Playlist } from '../types';
+import PlaylistPreviewModal from '../components/PlaylistPreviewModal';
 
 export default function PlaylistsPage() {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
@@ -13,6 +14,7 @@ export default function PlaylistsPage() {
   const [hasMore, setHasMore] = useState(true);
   const [skip, setSkip] = useState(0);
   const observerTarget = useRef<HTMLDivElement>(null);
+  const [previewPlaylist, setPreviewPlaylist] = useState<Playlist | null>(null);
   const ITEMS_PER_PAGE = 20;
 
   useEffect(() => {
@@ -176,6 +178,14 @@ export default function PlaylistsPage() {
                 </div>
                 <div className="flex space-x-2">
                   <button
+                    onClick={() => setPreviewPlaylist(playlist)}
+                    disabled={playlist.songs.length === 0}
+                    className="px-4 py-2 text-sm bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                  >
+                    <Eye size={16} />
+                    <span>Visualizar</span>
+                  </button>
+                  <button
                     onClick={() => handleGeneratePDF(playlist)}
                     disabled={generatingPDF === playlist.id || playlist.songs.length === 0}
                     className="px-4 py-2 text-sm bg-green-100 text-green-700 hover:bg-green-200 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
@@ -208,6 +218,14 @@ export default function PlaylistsPage() {
             {!hasMore && playlists.length > 0 && <p className="text-gray-400">Fim da lista</p>}
           </div>
         </div>
+      )}
+
+      {/* Modal de Visualização */}
+      {previewPlaylist && (
+        <PlaylistPreviewModal
+          playlist={previewPlaylist}
+          onClose={() => setPreviewPlaylist(null)}
+        />
       )}
     </div>
   );
