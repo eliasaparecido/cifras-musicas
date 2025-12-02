@@ -1,0 +1,50 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Song {
+  id          String   @id @default(uuid())
+  title       String
+  artist      String
+  originalKey String   // Tom original (ex: "C", "Am", "G#")
+  lyrics      String   // Letra com cifras
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  playlistSongs PlaylistSong[]
+  
+  @@index([title])
+  @@index([artist])
+}
+
+model Playlist {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  songs PlaylistSong[]
+  
+  @@index([name])
+}
+
+model PlaylistSong {
+  id         String   @id @default(uuid())
+  playlistId String
+  songId     String
+  order      Int      // Ordem da música na playlist
+  key        String   // Tom específico para esta playlist (pode ser diferente do original)
+  
+  playlist Playlist @relation(fields: [playlistId], references: [id], onDelete: Cascade)
+  song     Song     @relation(fields: [songId], references: [id], onDelete: Cascade)
+  
+  @@unique([playlistId, songId])
+  @@index([playlistId])
+  @@index([songId])
+}

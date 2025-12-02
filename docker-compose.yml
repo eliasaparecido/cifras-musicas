@@ -1,0 +1,50 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: cifras-backend
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+      - ./backend/prisma:/app/prisma
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+      - DATABASE_URL=file:/app/prisma/dev.db
+    command: npm run dev
+    networks:
+      - cifras-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: cifras-frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - VITE_API_URL=http://localhost:3001/api
+    command: npm run dev
+    depends_on:
+      - backend
+    networks:
+      - cifras-network
+
+networks:
+  cifras-network:
+    driver: bridge
+
+volumes:
+  node_modules_backend:
+  node_modules_frontend:
