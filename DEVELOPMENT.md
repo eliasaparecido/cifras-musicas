@@ -311,7 +311,7 @@ Acesse: http://localhost:5555
 
 **Backend (.env)**:
 ```bash
-PORT=3001
+PORT=3002
 DATABASE_URL="file:./production.db"
 NODE_ENV=production
 ```

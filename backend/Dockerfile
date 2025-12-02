@@ -25,7 +25,7 @@ COPY . .
 RUN npx prisma generate
 
 # Expor porta
-EXPOSE 3001
+EXPOSE 3002
 
 # Comando padrão (será sobrescrito no docker-compose)
 CMD ["npm", "run", "dev"]

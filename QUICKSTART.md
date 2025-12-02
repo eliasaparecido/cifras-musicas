@@ -20,8 +20,8 @@ docker-compose exec backend npx prisma migrate dev --name init
 
 ### 2. Acessar a Aplicação
 - **Frontend**: http://localhost:5173
-- **Backend**: http://localhost:3001
-- **Health Check**: http://localhost:3001/health
+- **Backend**: http://localhost:3002
+- **Health Check**: http://localhost:3002/health
 
 ### 3. Popular com Dados de Teste (Opcional)
 ```bash
@@ -114,7 +114,7 @@ sudo systemctl start docker
 Mude as portas no `docker-compose.yml`:
 ```yaml
 ports:
-  - "3002:3001"  # Backend
+  - "3003:3002"  # Backend
   - "5174:5173"  # Frontend
 ```
 
@@ -126,7 +126,7 @@ docker-compose exec backend npx prisma migrate dev --name init
 ### Frontend não carrega
 Verifique se o backend está rodando:
 ```bash
-curl http://localhost:3001/health
+curl http://localhost:3002/health
 ```
 
 ---

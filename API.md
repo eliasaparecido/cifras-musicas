@@ -2,7 +2,7 @@
 
 ## Base URL
 ```
-http://localhost:3001/api
+http://localhost:3002/api
 ```
 
 ## Endpoints
@@ -18,8 +18,8 @@ Query params:
 
 Response: Song[]
 ```
-
-#### Buscar música por ID
+```
+http://localhost:3002/api
 ```http
 GET /songs/:id
 Query params:
@@ -71,7 +71,6 @@ Response: Playlist[] (inclui músicas)
 ```http
 GET /playlists/:id
 
-Response: Playlist (com músicas ordenadas)
 ```
 
 #### Criar nova playlist
@@ -148,7 +147,6 @@ Response: application/pdf (arquivo binário)
 ```
 
 ---
-
 ## Modelos de Dados
 
 ### Song
@@ -162,7 +160,6 @@ Response: application/pdf (arquivo binário)
   createdAt: string;    // ISO timestamp
   updatedAt: string;    // ISO timestamp
 }
-```
 
 ### Playlist
 ```typescript
@@ -195,8 +192,8 @@ Response: application/pdf (arquivo binário)
 ### Criar e popular uma playlist completa
 
 ```javascript
-// 1. Criar músicas
-const song1 = await fetch('http://localhost:3001/api/songs', {
+await fetch(`http://localhost:3002/api/playlists/${playlist.id}/songs`, {
+const song1 = await fetch('http://localhost:3002/api/songs', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
@@ -206,12 +203,12 @@ const song1 = await fetch('http://localhost:3001/api/songs', {
     lyrics: `[G]Amazing [C]grace, how [G]sweet the [D]sound
 [G]That saved a [C]wretch like [G]me
 [G]I once was [C]lost, but [G]now am [D]found
-Was [G]blind but [C]now I [G]see`
+const pdfResponse = await fetch('http://localhost:3002/api/pdf/generate', {
   })
 });
 
 // 2. Criar playlist
-const playlist = await fetch('http://localhost:3001/api/playlists', {
+const playlist = await fetch('http://localhost:3002/api/playlists', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
@@ -220,19 +217,18 @@ const playlist = await fetch('http://localhost:3001/api/playlists', {
   })
 });
 
-// 3. Adicionar música à playlist (transpondo para C)
-await fetch(`http://localhost:3001/api/playlists/${playlist.id}/songs`, {
+const transposed = await fetch(
+  'http://localhost:3002/api/songs/[song-id]?key=C'
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
     songId: song1.id,
     key: "C",  // Transpõe de G para C
-    order: 0
   })
 });
 
 // 4. Gerar PDF
-const pdfResponse = await fetch('http://localhost:3001/api/pdf/generate', {
+const pdfResponse = await fetch('http://localhost:3002/api/pdf/generate', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({ playlistId: playlist.id })
@@ -243,12 +239,7 @@ const blob = await pdfResponse.blob();
 ```
 
 ### Transpor uma música
-
-```javascript
-// Buscar música no tom C (original está em G)
-const transposed = await fetch(
-  'http://localhost:3001/api/songs/[song-id]?key=C'
-);
+  'http://localhost:3002/api/songs/[song-id]?key=C'
 
 // A resposta conterá a letra com todos os acordes transpostos
 ```

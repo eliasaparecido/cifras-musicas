@@ -6,7 +6,7 @@ import pdfRoutes from './routes/pdfRoutes.js';
 import ocrRoutes from './routes/ocrRoutes.js';
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3002;
 
 // Middleware
 app.use(cors());

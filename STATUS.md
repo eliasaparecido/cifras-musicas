@@ -12,7 +12,7 @@ O projeto **Cifras Musicais** foi instalado com sucesso e está totalmente opera
 ### ✅ Containers Docker Ativos
 
 ```
-✅ cifras-backend   - Rodando na porta 3001
+✅ cifras-backend   - Rodando na porta 3002
 ✅ cifras-frontend  - Rodando na porta 5173
 ✅ Network criada   - cifras-network
 ```
@@ -37,7 +37,7 @@ O projeto **Cifras Musicais** foi instalado com sucesso e está totalmente opera
 
 ### ✅ Backend API
 
-**URL:** http://localhost:3001
+**URL:** http://localhost:3002
 
 **Endpoints testados:**
 - ✅ `GET /health` - Funcionando
@@ -74,7 +74,7 @@ O projeto **Cifras Musicais** foi instalado com sucesso e está totalmente opera
 Abra seu navegador em: **http://localhost:5173**
 
 ### API (Backend)
-Endpoints disponíveis em: **http://localhost:3001/api**
+Endpoints disponíveis em: **http://localhost:3002/api**
 
 ### Prisma Studio (Banco de Dados)
 ```bash

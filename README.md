@@ -102,8 +102,8 @@ make setup
 
 # Acessar a aplicação
 # Frontend: http://localhost:5173
-# Backend: http://localhost:3001
-# API Health Check: http://localhost:3001/health
+# Backend: http://localhost:3002
+# API Health Check: http://localhost:3002/health
 ```
 
 ### Comandos Make disponíveis
@@ -132,7 +132,7 @@ docker-compose exec backend npx prisma migrate dev --name init
 
 # 3. Acessar a aplicação
 # Frontend: http://localhost:5173
-# Backend: http://localhost:3001
+# Backend: http://localhost:3002
 ```
 
 ### Comandos úteis

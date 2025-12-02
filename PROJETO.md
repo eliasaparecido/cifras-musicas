@@ -175,7 +175,7 @@ docker-compose exec backend npx prisma migrate dev --name init
 
 **Acesse:**
 - Frontend: http://localhost:5173
-- Backend: http://localhost:3001
+- Backend: http://localhost:3002
 
 ---
 

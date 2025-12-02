@@ -38,5 +38,5 @@ seed: ## Adiciona dados de exemplo no banco
 setup: build upd migrate ## Setup completo do projeto
 	@echo "✅ Projeto configurado com sucesso!"
 	@echo "📱 Frontend: http://localhost:5173"
-	@echo "🔧 Backend: http://localhost:3001"
+	@echo "🔧 Backend: http://localhost:3002"
 	@echo "💾 Prisma Studio: Execute 'make studio' e acesse http://localhost:5555"

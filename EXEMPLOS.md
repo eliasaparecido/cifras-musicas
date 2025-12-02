@@ -151,7 +151,7 @@ Pra [G]casa do meu [D]Pai
 ### Via API (cURL)
 
 ```bash
-curl -X POST http://localhost:3001/api/songs \
+curl -X POST http://localhost:3002/api/songs \
   -H "Content-Type: application/json" \
   -d '{
     "title": "Amazing Grace",
