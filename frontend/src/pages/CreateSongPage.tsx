@@ -197,16 +197,39 @@ export default function CreateSongPage() {
               C&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Am<br/>
               Senhor meu Deus, quando eu maravilhado
             </code>
+            
+            <p className="font-semibold mt-3 mb-1 text-blue-600">📱 Dica para mobile:</p>
+            <p className="text-gray-600">As linhas guia verticais indicam: <span className="font-semibold">40 caracteres (celular)</span> e <span className="font-semibold">60 caracteres (tablet)</span></p>
           </div>
-          <textarea
-            value={formData.lyrics}
-            onChange={(e) => setFormData({ ...formData, lyrics: e.target.value })}
-            className="input-field font-mono"
-            rows={20}
-            placeholder="Cole sua música aqui em qualquer um dos formatos acima..."
-            required
-            disabled={loading}
-          />
+          <div className="relative">
+            {/* Linha guia para mobile - 40 caracteres */}
+            <div 
+              className="absolute top-0 bottom-0 pointer-events-none z-10"
+              style={{ 
+                left: 'calc(0.75rem + 40ch)',
+                borderLeft: '2px dashed rgba(59, 130, 246, 0.4)'
+              }}
+              title="Limite recomendado para celular (40 caracteres)"
+            />
+            {/* Linha guia para tablet - 60 caracteres */}
+            <div 
+              className="absolute top-0 bottom-0 pointer-events-none z-10"
+              style={{ 
+                left: 'calc(0.75rem + 60ch)',
+                borderLeft: '2px dashed rgba(168, 85, 247, 0.4)'
+              }}
+              title="Limite recomendado para tablet (60 caracteres)"
+            />
+            <textarea
+              value={formData.lyrics}
+              onChange={(e) => setFormData({ ...formData, lyrics: e.target.value })}
+              className="input-field font-mono relative"
+              rows={20}
+              placeholder="Cole sua música aqui em qualquer um dos formatos acima..."
+              required
+              disabled={loading}
+            />
+          </div>
         </div>
 
         <div className="flex justify-end space-x-3">
