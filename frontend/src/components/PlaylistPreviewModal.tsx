@@ -1,4 +1,5 @@
-import { X } from 'lucide-react';
+import { X, Maximize } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import { Playlist } from '../types';
 import { transposeChord } from '../utils/transposeUtils';
 
@@ -8,6 +9,38 @@ interface PlaylistPreviewModalProps {
 }
 
 export default function PlaylistPreviewModal({ playlist, onClose }: PlaylistPreviewModalProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
+
+  const toggleFullscreen = async () => {
+    if (!containerRef.current) return;
+
+    try {
+      if (!document.fullscreenElement) {
+        await containerRef.current.requestFullscreen();
+      } else {
+        await document.exitFullscreen();
+      }
+    } catch (error) {
+      console.error('Erro ao alternar fullscreen:', error);
+    }
+  };
+
+  const handleClose = async () => {
+    if (document.fullscreenElement) {
+      await document.exitFullscreen();
+    }
+    onClose();
+  };
   const convertToChordOverLyrics = (lyrics: string, transposeTo?: string, originalKey?: string) => {
     let processedLyrics = lyrics;
 
@@ -67,17 +100,27 @@ export default function PlaylistPreviewModal({ playlist, onClose }: PlaylistPrev
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-      <div className="bg-white w-full h-full overflow-hidden flex flex-col">
+      <div ref={containerRef} className="bg-white w-full h-full overflow-hidden flex flex-col">
         {/* Header */}
         <div className="flex justify-between items-center p-3 sm:p-4 border-b">
           <h2 className="text-lg sm:text-xl font-bold text-gray-900 break-words flex-1 pr-2">{playlist.name}</h2>
-          <button
-            onClick={onClose}
-            className="p-1 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
-            aria-label="Fechar"
-          >
-            <X size={20} />
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={toggleFullscreen}
+              className="p-1 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
+              aria-label="Fullscreen"
+              title="Fullscreen (F11)"
+            >
+              <Maximize size={20} />
+            </button>
+            <button
+              onClick={handleClose}
+              className="p-1 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
+              aria-label="Fechar"
+            >
+              <X size={20} />
+            </button>
+          </div>
         </div>
 
         {/* Content */}
