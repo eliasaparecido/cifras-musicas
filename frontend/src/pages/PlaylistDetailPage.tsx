@@ -183,31 +183,31 @@ export default function PlaylistDetailPage() {
           ← Voltar para Playlists
         </Link>
         
-        <div className="flex justify-between items-start">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">{playlist.name}</h1>
+        <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-4">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-2xl sm:text-3xl font-bold mb-2 break-words">{playlist.name}</h1>
             {playlist.description && (
-              <p className="text-gray-600 mb-4">{playlist.description}</p>
+              <p className="text-gray-600 mb-4 break-words">{playlist.description}</p>
             )}
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <button
               onClick={() => setShowPreview(true)}
               disabled={playlist.songs.length === 0}
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
+              className="px-3 sm:px-4 py-2 text-sm bg-blue-500 hover:bg-blue-700 text-white font-bold rounded disabled:opacity-50 flex-1 sm:flex-initial"
             >
               👁️ Visualizar
             </button>
             <button
               onClick={handleGeneratePDF}
               disabled={generatingPDF || playlist.songs.length === 0}
-              className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
+              className="px-3 sm:px-4 py-2 text-sm bg-green-500 hover:bg-green-700 text-white font-bold rounded disabled:opacity-50 flex-1 sm:flex-initial"
             >
-              {generatingPDF ? 'Gerando...' : '📄 Gerar PDF'}
+              {generatingPDF ? 'Gerando...' : '📄 PDF'}
             </button>
             <button
               onClick={handleDeletePlaylist}
-              className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+              className="px-3 sm:px-4 py-2 text-sm bg-red-500 hover:bg-red-700 text-white font-bold rounded flex-1 sm:flex-initial"
             >
               Excluir
             </button>
@@ -326,26 +326,26 @@ export default function PlaylistDetailPage() {
                   onDragOver={handleDragOver}
                   onDrop={() => handleDrop(index)}
                   onDragEnd={handleDragEnd}
-                  className={`flex items-center justify-between p-4 bg-gray-50 rounded hover:bg-gray-100 cursor-move transition-all ${
+                  className={`flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 bg-gray-50 rounded hover:bg-gray-100 cursor-move transition-all gap-3 ${
                     draggedIndex === index ? 'opacity-50 scale-95' : ''
                   }`}
                 >
-                  <div className="flex items-center gap-4">
-                    <span className="text-gray-400 hover:text-gray-600 cursor-grab active:cursor-grabbing">
+                  <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
+                    <span className="text-gray-400 hover:text-gray-600 cursor-grab active:cursor-grabbing flex-shrink-0">
                       ⋮⋮
                     </span>
-                    <span className="text-gray-500 font-bold">{index + 1}</span>
-                    <div>
+                    <span className="text-gray-500 font-bold flex-shrink-0">{index + 1}</span>
+                    <div className="min-w-0 flex-1">
                       <Link
                         to={`/songs/${playlistSong.songId}`}
-                        className="font-semibold hover:text-blue-500"
+                        className="font-semibold hover:text-blue-500 break-words"
                       >
                         {playlistSong.song.title}
                       </Link>
-                      <p className="text-sm text-gray-600">{playlistSong.song.artist}</p>
+                      <p className="text-sm text-gray-600 break-words">{playlistSong.song.artist}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2 sm:gap-4 justify-end">
                     {editingKey === playlistSong.id ? (
                       <div className="flex items-center gap-2">
                         <select

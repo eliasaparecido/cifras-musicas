@@ -66,27 +66,23 @@ export default function PlaylistPreviewModal({ playlist, onClose }: PlaylistPrev
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-2 sm:p-4">
+      <div className="bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex justify-between items-center p-6 border-b">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">{playlist.name}</h2>
-            {playlist.description && (
-              <p className="text-gray-600 mt-1">{playlist.description}</p>
-            )}
-          </div>
+        <div className="flex justify-between items-center p-3 sm:p-4 border-b">
+          <h2 className="text-lg sm:text-xl font-bold text-gray-900 break-words flex-1 pr-2">{playlist.name}</h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-1 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
+            aria-label="Fechar"
           >
-            <X size={24} />
+            <X size={20} />
           </button>
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6">
-          <div className="space-y-8">
+        <div className="flex-1 overflow-y-auto p-3 sm:p-4">
+          <div className="space-y-4 sm:space-y-6">
             {playlist.songs
               .sort((a, b) => a.order - b.order)
               .map((playlistSong, index) => {
@@ -97,16 +93,16 @@ export default function PlaylistPreviewModal({ playlist, onClose }: PlaylistPrev
                 );
 
                 return (
-                  <div key={playlistSong.id} className="border-b pb-8 last:border-b-0">
+                  <div key={playlistSong.id} className="border-b pb-4 sm:pb-6 last:border-b-0">
                     {/* Song Header */}
-                    <div className="mb-4">
-                      <div className="flex items-baseline gap-3">
-                        <span className="text-2xl font-bold text-gray-400">{index + 1}.</span>
-                        <div>
-                          <h3 className="text-2xl font-bold text-gray-900">
+                    <div className="mb-3">
+                      <div className="flex items-baseline gap-2 sm:gap-3">
+                        <span className="text-xl sm:text-2xl font-bold text-gray-400 flex-shrink-0">{index + 1}.</span>
+                        <div className="min-w-0 flex-1">
+                          <h3 className="text-lg sm:text-2xl font-bold text-gray-900 break-words">
                             {playlistSong.song.title}
                           </h3>
-                          <p className="text-gray-600">
+                          <p className="text-sm sm:text-base text-gray-600 break-words">
                             {playlistSong.song.artist} • Tom: {playlistSong.key}
                           </p>
                         </div>
@@ -114,8 +110,8 @@ export default function PlaylistPreviewModal({ playlist, onClose }: PlaylistPrev
                     </div>
 
                     {/* Song Lyrics */}
-                    <div className="bg-gray-50 rounded-lg p-6">
-                      <pre className="font-mono text-sm whitespace-pre-wrap">
+                    <div className="bg-gray-50 rounded-lg p-3 sm:p-4 overflow-x-auto">
+                      <pre className="lyrics-display">
                         {lyrics}
                       </pre>
                     </div>
@@ -123,16 +119,6 @@ export default function PlaylistPreviewModal({ playlist, onClose }: PlaylistPrev
                 );
               })}
           </div>
-        </div>
-
-        {/* Footer */}
-        <div className="flex justify-end gap-3 p-6 border-t bg-gray-50">
-          <button
-            onClick={onClose}
-            className="px-6 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors"
-          >
-            Fechar
-          </button>
         </div>
       </div>
     </div>

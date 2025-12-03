@@ -95,9 +95,9 @@ export default function SongsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-900">Músicas</h1>
-        <Link to="/songs/new" className="btn-primary flex items-center space-x-2">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Músicas</h1>
+        <Link to="/songs/new" className="btn-primary flex items-center justify-center space-x-2">
           <Plus size={20} />
           <span>Nova Música</span>
         </Link>
@@ -106,7 +106,7 @@ export default function SongsPage() {
       {/* Search */}
       <form onSubmit={handleSearch} className="flex gap-2">
         <div className="flex-1 relative">
-          <Search className="absolute left-3 top-3 text-gray-400" size={20} />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
           <input
             type="text"
             placeholder="Buscar por título ou artista..."
@@ -115,7 +115,7 @@ export default function SongsPage() {
             className="input-field pl-10"
           />
         </div>
-        <button type="submit" className="btn-primary">
+        <button type="submit" className="btn-primary px-4 sm:px-6">
           Buscar
         </button>
       </form>
@@ -138,29 +138,29 @@ export default function SongsPage() {
         <div className="grid gap-4">
           {songs.map((song) => (
             <div key={song.id} className="card hover:shadow-lg transition-shadow">
-              <div className="flex justify-between items-start">
-                <div className="flex-1">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+                <div className="flex-1 min-w-0">
                   <Link
                     to={`/songs/${song.id}`}
-                    className="text-xl font-bold text-gray-900 hover:text-primary-600"
+                    className="text-lg sm:text-xl font-bold text-gray-900 hover:text-primary-600 break-words"
                   >
                     {song.title}
                   </Link>
-                  <p className="text-gray-600">{song.artist}</p>
+                  <p className="text-gray-600 break-words">{song.artist}</p>
                   <p className="text-sm text-gray-500 mt-2">
                     Tom: <span className="font-semibold">{song.originalKey}</span>
                   </p>
                 </div>
-                <div className="flex space-x-2">
+                <div className="flex flex-wrap gap-2">
                   <Link
                     to={`/songs/${song.id}/edit`}
-                    className="px-4 py-2 text-sm bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                    className="px-3 sm:px-4 py-2 text-sm bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors flex-1 sm:flex-initial text-center"
                   >
                     Editar
                   </Link>
                   <button
                     onClick={() => handleDelete(song.id)}
-                    className="px-4 py-2 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-lg transition-colors"
+                    className="px-3 sm:px-4 py-2 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-lg transition-colors flex-1 sm:flex-initial"
                   >
                     Excluir
                   </button>

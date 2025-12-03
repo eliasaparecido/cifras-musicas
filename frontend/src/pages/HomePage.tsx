@@ -5,33 +5,33 @@ export default function HomePage() {
   return (
     <div className="space-y-8">
       <div className="text-center">
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">
+        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
           Bem-vindo ao Cifras Musicais
         </h1>
-        <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+        <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto px-4">
           Gerencie suas cifras, crie playlists personalizadas e transponha tons com facilidade.
           Gere PDFs para levar suas músicas para qualquer lugar!
         </p>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-6 mt-12">
+      <div className="grid sm:grid-cols-2 gap-6 mt-12">
         {/* Card Músicas */}
         <div className="card hover:shadow-lg transition-shadow">
           <div className="flex items-center space-x-4 mb-4">
-            <div className="p-3 bg-primary-100 rounded-lg">
+            <div className="p-3 bg-primary-100 rounded-lg flex-shrink-0">
               <Music size={32} className="text-primary-600" />
             </div>
-            <h2 className="text-2xl font-bold text-gray-900">Músicas</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Músicas</h2>
           </div>
           <p className="text-gray-600 mb-6">
             Cadastre e gerencie suas cifras musicais. Transponha para qualquer tom instantaneamente.
           </p>
-          <div className="flex space-x-3">
-            <Link to="/songs/new" className="btn-primary flex items-center space-x-2">
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Link to="/songs/new" className="btn-primary flex items-center justify-center space-x-2">
               <Plus size={20} />
               <span>Nova Música</span>
             </Link>
-            <Link to="/songs" className="btn-secondary">
+            <Link to="/songs" className="btn-secondary text-center">
               Ver Todas
             </Link>
           </div>
@@ -40,20 +40,20 @@ export default function HomePage() {
         {/* Card Playlists */}
         <div className="card hover:shadow-lg transition-shadow">
           <div className="flex items-center space-x-4 mb-4">
-            <div className="p-3 bg-green-100 rounded-lg">
+            <div className="p-3 bg-green-100 rounded-lg flex-shrink-0">
               <List size={32} className="text-green-600" />
             </div>
-            <h2 className="text-2xl font-bold text-gray-900">Playlists</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Playlists</h2>
           </div>
           <p className="text-gray-600 mb-6">
             Organize suas músicas em playlists temáticas e gere PDFs prontos para impressão.
           </p>
-          <div className="flex space-x-3">
-            <Link to="/playlists/new" className="btn-primary flex items-center space-x-2">
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Link to="/playlists/new" className="btn-primary flex items-center justify-center space-x-2">
               <Plus size={20} />
               <span>Nova Playlist</span>
             </Link>
-            <Link to="/playlists" className="btn-secondary">
+            <Link to="/playlists" className="btn-secondary text-center">
               Ver Todas
             </Link>
           </div>
@@ -61,7 +61,7 @@ export default function HomePage() {
       </div>
 
       {/* Features */}
-      <div className="mt-16 grid md:grid-cols-3 gap-6">
+      <div className="mt-16 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <div className="text-center">
           <div className="inline-block p-4 bg-blue-100 rounded-full mb-4">
             <Music size={32} className="text-blue-600" />

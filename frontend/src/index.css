@@ -24,4 +24,19 @@
   .card {
     @apply bg-white rounded-lg shadow-md p-6;
   }
+  
+  .lyrics-display {
+    @apply font-mono text-sm leading-relaxed;
+    white-space: pre;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    max-width: 100%;
+  }
+  
+  @media (max-width: 640px) {
+    .lyrics-display {
+      font-size: 0.75rem;
+      line-height: 1.4;
+    }
+  }
 }

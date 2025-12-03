@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, List as ListIcon, FileDown, Search, Eye } from 'lucide-react';
+import { Plus, List as ListIcon, FileDown, Search, Eye, Copy } from 'lucide-react';
 import { playlistService } from '../services/playlistService';
 import { Playlist } from '../types';
 import PlaylistPreviewModal from '../components/PlaylistPreviewModal';
+import DuplicatePlaylistModal from '../components/DuplicatePlaylistModal';
 
 export default function PlaylistsPage() {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
@@ -15,6 +16,7 @@ export default function PlaylistsPage() {
   const [skip, setSkip] = useState(0);
   const observerTarget = useRef<HTMLDivElement>(null);
   const [previewPlaylist, setPreviewPlaylist] = useState<Playlist | null>(null);
+  const [duplicatePlaylist, setDuplicatePlaylist] = useState<Playlist | null>(null);
   const ITEMS_PER_PAGE = 20;
 
   useEffect(() => {
@@ -117,6 +119,19 @@ export default function PlaylistsPage() {
     }
   };
 
+  const handleDuplicate = async (newName: string) => {
+    if (!duplicatePlaylist) return;
+
+    try {
+      await playlistService.duplicate(duplicatePlaylist.id, newName);
+      setDuplicatePlaylist(null);
+      loadPlaylists(true);
+    } catch (error) {
+      console.error('Erro ao duplicar playlist:', error);
+      alert('Erro ao duplicar playlist');
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -161,49 +176,58 @@ export default function PlaylistsPage() {
         <div className="grid gap-4">
           {playlists.map((playlist) => (
             <div key={playlist.id} className="card hover:shadow-lg transition-shadow">
-              <div className="flex justify-between items-start">
-                <div className="flex-1">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+                <div className="flex-1 min-w-0">
                   <Link
                     to={`/playlists/${playlist.id}`}
-                    className="text-xl font-bold text-gray-900 hover:text-primary-600"
+                    className="text-lg sm:text-xl font-bold text-gray-900 hover:text-primary-600 break-words"
                   >
                     {playlist.name}
                   </Link>
                   {playlist.description && (
-                    <p className="text-gray-600 mt-1">{playlist.description}</p>
+                    <p className="text-gray-600 mt-1 break-words">{playlist.description}</p>
                   )}
                   <p className="text-sm text-gray-500 mt-2">
                     {playlist.songs.length} {playlist.songs.length === 1 ? 'música' : 'músicas'}
                   </p>
                 </div>
-                <div className="flex space-x-2">
+                <div className="flex flex-wrap gap-2">
                   <button
                     onClick={() => setPreviewPlaylist(playlist)}
                     disabled={playlist.songs.length === 0}
-                    className="px-4 py-2 text-sm bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                    className="px-3 py-2 text-xs sm:text-sm bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1 sm:space-x-2"
                   >
-                    <Eye size={16} />
-                    <span>Visualizar</span>
+                    <Eye size={16} className="flex-shrink-0" />
+                    <span className="hidden sm:inline">Visualizar</span>
+                    <span className="sm:hidden">Ver</span>
+                  </button>
+                  <button
+                    onClick={() => setDuplicatePlaylist(playlist)}
+                    className="px-3 py-2 text-xs sm:text-sm bg-purple-100 text-purple-700 hover:bg-purple-200 rounded-lg transition-colors flex items-center space-x-1 sm:space-x-2"
+                  >
+                    <Copy size={16} className="flex-shrink-0" />
+                    <span className="hidden sm:inline">Duplicar</span>
+                    <span className="sm:hidden">Dup</span>
                   </button>
                   <button
                     onClick={() => handleGeneratePDF(playlist)}
                     disabled={generatingPDF === playlist.id || playlist.songs.length === 0}
-                    className="px-4 py-2 text-sm bg-green-100 text-green-700 hover:bg-green-200 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                    className="px-3 py-2 text-xs sm:text-sm bg-green-100 text-green-700 hover:bg-green-200 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1 sm:space-x-2"
                   >
-                    <FileDown size={16} />
+                    <FileDown size={16} className="flex-shrink-0" />
                     <span>
                       {generatingPDF === playlist.id ? 'Gerando...' : 'PDF'}
                     </span>
                   </button>
                   <Link
                     to={`/playlists/${playlist.id}/edit`}
-                    className="px-4 py-2 text-sm bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                    className="px-3 py-2 text-xs sm:text-sm bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors inline-flex items-center"
                   >
                     Editar
                   </Link>
                   <button
                     onClick={() => handleDelete(playlist.id)}
-                    className="px-4 py-2 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-lg transition-colors"
+                    className="px-3 py-2 text-xs sm:text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-lg transition-colors"
                   >
                     Excluir
                   </button>
@@ -225,6 +249,15 @@ export default function PlaylistsPage() {
         <PlaylistPreviewModal
           playlist={previewPlaylist}
           onClose={() => setPreviewPlaylist(null)}
+        />
+      )}
+
+      {/* Modal de Duplicação */}
+      {duplicatePlaylist && (
+        <DuplicatePlaylistModal
+          playlistName={duplicatePlaylist.name}
+          onConfirm={handleDuplicate}
+          onClose={() => setDuplicatePlaylist(null)}
         />
       )}
     </div>

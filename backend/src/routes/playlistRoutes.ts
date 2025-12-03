@@ -10,6 +10,10 @@ const createPlaylistSchema = z.object({
   description: z.string().optional(),
 });
 
+const duplicatePlaylistSchema = z.object({
+  name: z.string().min(1, 'Nome é obrigatório'),
+});
+
 const addSongToPlaylistSchema = z.object({
   songId: z.string().uuid('ID da música inválido'),
   key: z.string().min(1, 'Tom é obrigatório'),
@@ -173,6 +177,59 @@ router.delete('/:id', async (req, res) => {
   } catch (error) {
     console.error('Error deleting playlist:', error);
     res.status(500).json({ error: 'Erro ao deletar playlist' });
+  }
+});
+
+// POST /api/playlists/:id/duplicate - Duplicar playlist
+router.post('/:id/duplicate', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const validatedData = duplicatePlaylistSchema.parse(req.body);
+    
+    // Buscar playlist original com todas as músicas
+    const originalPlaylist = await prisma.playlist.findUnique({
+      where: { id },
+      include: {
+        songs: {
+          orderBy: { order: 'asc' },
+        },
+      },
+    });
+    
+    if (!originalPlaylist) {
+      return res.status(404).json({ error: 'Playlist não encontrada' });
+    }
+    
+    // Criar nova playlist com as músicas
+    const newPlaylist = await prisma.playlist.create({
+      data: {
+        name: validatedData.name,
+        description: originalPlaylist.description,
+        songs: {
+          create: originalPlaylist.songs.map((song) => ({
+            songId: song.songId,
+            key: song.key,
+            order: song.order,
+          })),
+        },
+      },
+      include: {
+        songs: {
+          include: {
+            song: true,
+          },
+          orderBy: { order: 'asc' },
+        },
+      },
+    });
+    
+    res.status(201).json(newPlaylist);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({ error: 'Dados inválidos', details: error.errors });
+    }
+    console.error('Error duplicating playlist:', error);
+    res.status(500).json({ error: 'Erro ao duplicar playlist' });
   }
 });
 

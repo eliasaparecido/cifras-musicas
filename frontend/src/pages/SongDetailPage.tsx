@@ -65,31 +65,31 @@ export default function SongDetailPage() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
-      <div className="flex justify-between items-center">
-        <div className="flex items-center space-x-4">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+        <div className="flex items-center space-x-2 sm:space-x-4 min-w-0">
           <button
             onClick={() => navigate('/songs')}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
           >
             <ArrowLeft size={24} />
           </button>
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">{song.title}</h1>
-            <p className="text-gray-600">{song.artist}</p>
+          <div className="min-w-0 flex-1">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 break-words">{song.title}</h1>
+            <p className="text-gray-600 break-words">{song.artist}</p>
           </div>
         </div>
 
-        <div className="flex space-x-2">
+        <div className="flex flex-wrap gap-2">
           <Link
             to={`/songs/${id}/edit`}
-            className="btn-secondary flex items-center space-x-2"
+            className="btn-secondary flex items-center space-x-2 justify-center flex-1 sm:flex-initial"
           >
             <Edit size={20} />
             <span>Editar</span>
           </Link>
           <button
             onClick={handleDelete}
-            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors flex items-center space-x-2"
+            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors flex items-center space-x-2 justify-center flex-1 sm:flex-initial"
           >
             <Trash2 size={20} />
             <span>Excluir</span>
@@ -98,8 +98,8 @@ export default function SongDetailPage() {
       </div>
 
       <div className="card">
-        <div className="flex items-center space-x-4 mb-6">
-          <div>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-6">
+          <div className="flex-1">
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Tom Original: <span className="font-bold">{song.originalKey}</span>
             </label>
@@ -109,7 +109,7 @@ export default function SongDetailPage() {
             <select
               value={currentKey}
               onChange={(e) => handleKeyChange(e.target.value)}
-              className="input-field"
+              className="input-field max-w-xs"
             >
               {ALL_KEYS.map((key) => (
                 <option key={key} value={key}>
@@ -125,8 +125,8 @@ export default function SongDetailPage() {
           )}
         </div>
 
-        <div className="bg-gray-50 p-6 rounded-lg">
-          <pre className="whitespace-pre-wrap font-mono text-sm leading-relaxed">
+        <div className="bg-gray-50 p-4 sm:p-6 rounded-lg overflow-x-auto">
+          <pre className="lyrics-display">
             {song.lyrics}
           </pre>
         </div>

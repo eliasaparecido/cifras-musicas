@@ -31,6 +31,12 @@ export const playlistService = {
     await api.delete(`/playlists/${id}`);
   },
 
+  // Duplicar playlist
+  async duplicate(id: string, name: string): Promise<Playlist> {
+    const response = await api.post(`/playlists/${id}/duplicate`, { name });
+    return response.data;
+  },
+
   // Adicionar música à playlist
   async addSong(playlistId: string, data: AddSongToPlaylistDto): Promise<void> {
     await api.post(`/playlists/${playlistId}/songs`, data);
