@@ -124,8 +124,8 @@ export default function PlaylistPreviewModal({ playlist, onClose }: PlaylistPrev
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-3 sm:p-4">
-          <div className="space-y-4 sm:space-y-6">
+        <div className="flex-1 overflow-y-auto p-4">
+          <div className="space-y-6">
             {playlist.songs
               .sort((a, b) => a.order - b.order)
               .map((playlistSong, index) => {
@@ -136,16 +136,16 @@ export default function PlaylistPreviewModal({ playlist, onClose }: PlaylistPrev
                 );
 
                 return (
-                  <div key={playlistSong.id} className="border-b pb-4 sm:pb-6 last:border-b-0">
+                  <div key={playlistSong.id} className="border-b pb-6 last:border-b-0">
                     {/* Song Header */}
                     <div className="mb-3">
-                      <div className="flex items-baseline gap-2 sm:gap-3">
-                        <span className="text-xl sm:text-2xl font-bold text-gray-400 flex-shrink-0">{index + 1}.</span>
+                      <div className="flex items-baseline gap-3">
+                        <span className="text-2xl font-bold text-gray-400 flex-shrink-0">{index + 1}.</span>
                         <div className="min-w-0 flex-1">
-                          <h3 className="text-lg sm:text-2xl font-bold text-gray-900 break-words">
+                          <h3 className="text-2xl font-bold text-gray-900 break-words">
                             {playlistSong.song.title}
                           </h3>
-                          <p className="text-sm sm:text-base text-gray-600 break-words">
+                          <p className="text-base text-gray-600 break-words">
                             {playlistSong.song.artist} • Tom: {playlistSong.key}
                           </p>
                         </div>
@@ -153,7 +153,7 @@ export default function PlaylistPreviewModal({ playlist, onClose }: PlaylistPrev
                     </div>
 
                     {/* Song Lyrics */}
-                    <div className="bg-gray-50 rounded-lg p-3 sm:p-4 overflow-x-auto">
+                    <div className="bg-gray-50 rounded-lg p-4 overflow-x-auto">
                       <pre className="lyrics-display">
                         {lyrics}
                       </pre>

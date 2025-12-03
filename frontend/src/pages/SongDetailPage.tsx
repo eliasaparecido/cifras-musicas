@@ -125,7 +125,7 @@ export default function SongDetailPage() {
           )}
         </div>
 
-        <div className="bg-gray-50 p-4 sm:p-6 rounded-lg overflow-x-auto">
+        <div className="bg-gray-50 p-4 rounded-lg overflow-x-auto">
           <pre className="lyrics-display">
             {song.lyrics}
           </pre>
