@@ -2,9 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap');
+
 @layer base {
   body {
     @apply bg-gray-50 text-gray-900;
+  }
+  
+  /* Sobrescrever a fonte mono do Tailwind para usar Roboto Mono */
+  .font-mono {
+    font-family: 'Roboto Mono', 'Courier New', Courier, monospace !important;
   }
 }
 
@@ -26,7 +33,7 @@
   }
   
   .lyrics-display {
-    font-family: 'Courier New', Courier, monospace;
+    font-family: 'Roboto Mono', 'Courier New', Courier, monospace;
     font-size: 0.875rem;
     line-height: 1.6;
     white-space: pre;
