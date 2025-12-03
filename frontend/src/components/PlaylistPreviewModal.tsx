@@ -66,8 +66,8 @@ export default function PlaylistPreviewModal({ playlist, onClose }: PlaylistPrev
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-2 sm:p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-hidden flex flex-col">
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+      <div className="bg-white w-full h-full overflow-hidden flex flex-col">
         {/* Header */}
         <div className="flex justify-between items-center p-3 sm:p-4 border-b">
           <h2 className="text-lg sm:text-xl font-bold text-gray-900 break-words flex-1 pr-2">{playlist.name}</h2>
