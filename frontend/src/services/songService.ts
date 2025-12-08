@@ -8,6 +8,14 @@ export const songService = {
     return response.data;
   },
 
+  // Listar todas as músicas sem paginação (para selects)
+  async getAllWithoutPagination(): Promise<Song[]> {
+    const response = await api.get('/songs', { 
+      params: { take: 999999 } // Um número muito alto para garantir que pegue todas
+    });
+    return response.data;
+  },
+
   // Buscar uma música específica
   async getById(id: string, key?: string): Promise<Song> {
     const response = await api.get(`/songs/${id}`, { 

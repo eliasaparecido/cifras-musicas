@@ -35,7 +35,7 @@ export default function PlaylistDetailPage() {
     try {
       const [playlistData, songsData] = await Promise.all([
         playlistService.getById(id),
-        songService.getAll(),
+        songService.getAllWithoutPagination(),
       ]);
       setPlaylist(playlistData);
       setAvailableSongs(songsData);
