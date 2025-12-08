@@ -60,6 +60,7 @@ export default function PlaylistDetailPage() {
       setShowAddSong(false);
       setSelectedSongId('');
       setSongKey('');
+      setSearchQuery('');
     } catch (error) {
       console.error('Erro ao adicionar música:', error);
       alert('Erro ao adicionar música');
