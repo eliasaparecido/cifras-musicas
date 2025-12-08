@@ -13,6 +13,19 @@ export default function PlaylistPreviewModal({ playlist, onClose }: PlaylistPrev
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    // Detectar dispositivo móvel
+    const checkMobile = () => {
+      setIsMobile(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   useEffect(() => {
     const loadPDF = async () => {
@@ -79,6 +92,11 @@ export default function PlaylistPreviewModal({ playlist, onClose }: PlaylistPrev
     document.body.removeChild(a);
   };
 
+  const handleOpenPDF = () => {
+    if (!pdfUrl) return;
+    window.open(pdfUrl, '_blank');
+  };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
       <div ref={containerRef} className="bg-white w-full h-full overflow-hidden flex flex-col">
@@ -120,11 +138,33 @@ export default function PlaylistPreviewModal({ playlist, onClose }: PlaylistPrev
               <div className="text-gray-600">Carregando PDF...</div>
             </div>
           ) : pdfUrl ? (
-            <iframe
-              src={pdfUrl}
-              className="w-full h-full border-0"
-              title={`PDF - ${playlist.name}`}
-            />
+            isMobile ? (
+              // Em mobile, mostrar botão para abrir em nova aba
+              <div className="flex flex-col items-center justify-center h-full p-6 text-center">
+                <p className="text-gray-700 mb-6">
+                  Para visualizar o PDF no celular, clique no botão abaixo para abrir em uma nova aba:
+                </p>
+                <button
+                  onClick={handleOpenPDF}
+                  className="px-6 py-3 bg-blue-500 hover:bg-blue-700 text-white font-bold rounded-lg mb-4"
+                >
+                  Abrir PDF
+                </button>
+                <button
+                  onClick={handleDownload}
+                  className="px-6 py-3 bg-green-500 hover:bg-green-700 text-white font-bold rounded-lg"
+                >
+                  Baixar PDF
+                </button>
+              </div>
+            ) : (
+              // Em desktop, mostrar iframe
+              <iframe
+                src={pdfUrl}
+                className="w-full h-full border-0"
+                title={`PDF - ${playlist.name}`}
+              />
+            )
           ) : (
             <div className="flex items-center justify-center h-full">
               <div className="text-red-600">Erro ao carregar PDF</div>
