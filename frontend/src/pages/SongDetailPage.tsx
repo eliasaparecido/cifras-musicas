@@ -1,19 +1,21 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, Edit, Trash2 } from 'lucide-react';
-import { songService } from '../services/songService';
-import { Song } from '../types';
+import { useState, useEffect } from "react";
+import { useParams, useNavigate, Link } from "react-router-dom";
+import { ArrowLeft, Edit, Trash2, Music } from "lucide-react";
+import { songService } from "../services/songService";
+import { Song } from "../types";
 
-const KEYS = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-const MINOR_KEYS = KEYS.map(k => k + 'm');
+const KEYS = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+const MINOR_KEYS = KEYS.map((k) => k + "m");
 const ALL_KEYS = [...KEYS, ...MINOR_KEYS];
 
 export default function SongDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [song, setSong] = useState<Song | null>(null);
-  const [currentKey, setCurrentKey] = useState('');
+  const [currentKey, setCurrentKey] = useState("");
   const [loading, setLoading] = useState(true);
+  const [showTransposeModal, setShowTransposeModal] = useState(false);
+  const [transposeKey, setTransposeKey] = useState("");
 
   useEffect(() => {
     if (id) {
@@ -28,8 +30,8 @@ export default function SongDetailPage() {
       setSong(data);
       setCurrentKey(key || data.originalKey);
     } catch (error) {
-      console.error('Erro ao carregar música:', error);
-      alert('Erro ao carregar música');
+      console.error("Erro ao carregar música:", error);
+      alert("Erro ao carregar música");
     } finally {
       setLoading(false);
     }
@@ -37,13 +39,16 @@ export default function SongDetailPage() {
 
   const handleDelete = async () => {
     if (!id) return;
-    if (window.confirm('Tem certeza que deseja excluir esta música?')) {
+    if (window.confirm("Tem certeza que deseja excluir esta música?")) {
       try {
         await songService.delete(id);
-        navigate('/songs');
+        navigate("/songs");
       } catch (error: any) {
-        console.error('Erro ao deletar música:', error);
-        const message = error?.response?.data?.message || error?.response?.data?.error || 'Erro ao deletar música';
+        console.error("Erro ao deletar música:", error);
+        const message =
+          error?.response?.data?.message ||
+          error?.response?.data?.error ||
+          "Erro ao deletar música";
         alert(message);
       }
     }
@@ -52,6 +57,28 @@ export default function SongDetailPage() {
   const handleKeyChange = (newKey: string) => {
     if (id) {
       loadSong(id, newKey);
+    }
+  };
+
+  const handleTranspose = async () => {
+    if (!id || !transposeKey) return;
+
+    if (
+      !window.confirm(
+        `Tem certeza que deseja transpor esta música para ${transposeKey} e salvar permanentemente?`
+      )
+    ) {
+      return;
+    }
+
+    try {
+      await songService.transpose(id, transposeKey);
+      setShowTransposeModal(false);
+      loadSong(id);
+    } catch (error: any) {
+      console.error("Erro ao transpor música:", error);
+      const message = error?.response?.data?.error || "Erro ao transpor música";
+      alert(message);
     }
   };
 
@@ -68,13 +95,15 @@ export default function SongDetailPage() {
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
         <div className="flex items-center space-x-2 sm:space-x-4 min-w-0">
           <button
-            onClick={() => navigate('/songs')}
+            onClick={() => navigate("/songs")}
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
           >
             <ArrowLeft size={24} />
           </button>
           <div className="min-w-0 flex-1">
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 break-words">{song.title}</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 break-words">
+              {song.title}
+            </h1>
             <p className="text-gray-600 break-words">{song.artist}</p>
           </div>
         </div>
@@ -87,6 +116,16 @@ export default function SongDetailPage() {
             <Edit size={20} />
             <span>Editar</span>
           </Link>
+          <button
+            onClick={() => {
+              setTransposeKey(song.originalKey);
+              setShowTransposeModal(true);
+            }}
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center space-x-2 justify-center flex-1 sm:flex-initial"
+          >
+            <Music size={20} />
+            <span>Transpor Tom</span>
+          </button>
           <button
             onClick={handleDelete}
             className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors flex items-center space-x-2 justify-center flex-1 sm:flex-initial"
@@ -101,7 +140,8 @@ export default function SongDetailPage() {
         <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-6">
           <div className="flex-1">
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Tom Original: <span className="font-bold">{song.originalKey}</span>
+              Tom Original:{" "}
+              <span className="font-bold">{song.originalKey}</span>
             </label>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Transpor para:
@@ -126,11 +166,56 @@ export default function SongDetailPage() {
         </div>
 
         <div className="bg-gray-50 p-4 rounded-lg overflow-x-auto">
-          <pre className="lyrics-display">
-            {song.lyrics}
-          </pre>
+          <pre className="lyrics-display">{song.lyrics}</pre>
         </div>
       </div>
+
+      {showTransposeModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+            <h2 className="text-2xl font-bold mb-4">Transpor Tom da Música</h2>
+            <p className="text-gray-600 mb-4">
+              Esta ação irá transpor a música e salvar permanentemente com o
+              novo tom.
+            </p>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Tom atual: <span className="font-bold">{song.originalKey}</span>
+              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Novo tom:
+              </label>
+              <select
+                value={transposeKey}
+                onChange={(e) => setTransposeKey(e.target.value)}
+                className="input-field w-full"
+                autoFocus
+              >
+                {ALL_KEYS.map((key) => (
+                  <option key={key} value={key}>
+                    {key}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="flex gap-2 justify-end">
+              <button
+                onClick={() => setShowTransposeModal(false)}
+                className="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-lg transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleTranspose}
+                disabled={!transposeKey || transposeKey === song.originalKey}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Transpor e Salvar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
