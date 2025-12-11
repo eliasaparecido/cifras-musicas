@@ -1,22 +1,34 @@
-import { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
-import { Plus, List as ListIcon, FileDown, Search, Eye, Copy } from 'lucide-react';
-import { playlistService } from '../services/playlistService';
-import { Playlist } from '../types';
-import PlaylistPreviewModal from '../components/PlaylistPreviewModal';
-import DuplicatePlaylistModal from '../components/DuplicatePlaylistModal';
+import { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
+import {
+  Plus,
+  List as ListIcon,
+  FileDown,
+  Search,
+  Eye,
+  Copy,
+} from "lucide-react";
+import { playlistService } from "../services/playlistService";
+import { Playlist } from "../types";
+import PlaylistPreviewModal from "../components/PlaylistPreviewModal";
+import DuplicatePlaylistModal from "../components/DuplicatePlaylistModal";
 
 export default function PlaylistsPage() {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [generatingPDF, setGeneratingPDF] = useState<string | null>(null);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
   const [hasMore, setHasMore] = useState(true);
   const [skip, setSkip] = useState(0);
   const observerTarget = useRef<HTMLDivElement>(null);
   const [previewPlaylist, setPreviewPlaylist] = useState<Playlist | null>(null);
-  const [duplicatePlaylist, setDuplicatePlaylist] = useState<Playlist | null>(null);
+  const [duplicatePlaylist, setDuplicatePlaylist] = useState<Playlist | null>(
+    null
+  );
+  const [pdfOptionsPlaylist, setPdfOptionsPlaylist] = useState<Playlist | null>(
+    null
+  );
   const ITEMS_PER_PAGE = 20;
 
   useEffect(() => {
@@ -48,26 +60,26 @@ export default function PlaylistsPage() {
       } else {
         setLoadingMore(true);
       }
-      
+
       const currentSkip = reset ? 0 : skip;
-      const data = await playlistService.getAll({ 
+      const data = await playlistService.getAll({
         search: search || undefined,
         skip: currentSkip,
-        take: ITEMS_PER_PAGE 
+        take: ITEMS_PER_PAGE,
       });
-      
+
       if (reset) {
         setPlaylists(data);
       } else {
-        setPlaylists(prev => [...prev, ...data]);
+        setPlaylists((prev) => [...prev, ...data]);
       }
-      
+
       setHasMore(data.length === ITEMS_PER_PAGE);
       if (!reset) {
         setSkip(currentSkip + ITEMS_PER_PAGE);
       }
     } catch (error) {
-      console.error('Erro ao carregar playlists:', error);
+      console.error("Erro ao carregar playlists:", error);
     } finally {
       setLoading(false);
       setLoadingMore(false);
@@ -86,34 +98,38 @@ export default function PlaylistsPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (window.confirm('Tem certeza que deseja excluir esta playlist?')) {
+    if (window.confirm("Tem certeza que deseja excluir esta playlist?")) {
       try {
         await playlistService.delete(id);
         loadPlaylists();
       } catch (error) {
-        console.error('Erro ao deletar playlist:', error);
-        alert('Erro ao deletar playlist');
+        console.error("Erro ao deletar playlist:", error);
+        alert("Erro ao deletar playlist");
       }
     }
   };
 
-  const handleGeneratePDF = async (playlist: Playlist) => {
+  const handleGeneratePDF = async (playlist: Playlist, showChords: boolean) => {
     try {
       setGeneratingPDF(playlist.id);
-      const pdfBlob = await playlistService.generatePDF(playlist.id);
-      
+      setPdfOptionsPlaylist(null);
+      const pdfBlob = await playlistService.generatePDF(
+        playlist.id,
+        showChords
+      );
+
       // Criar link para download
       const url = window.URL.createObjectURL(pdfBlob);
-      const a = document.createElement('a');
+      const a = document.createElement("a");
       a.href = url;
-      a.download = `${playlist.name}.pdf`;
+      a.download = `${playlist.name}${showChords ? "" : "-sem-cifras"}.pdf`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
     } catch (error) {
-      console.error('Erro ao gerar PDF:', error);
-      alert('Erro ao gerar PDF');
+      console.error("Erro ao gerar PDF:", error);
+      alert("Erro ao gerar PDF");
     } finally {
       setGeneratingPDF(null);
     }
@@ -127,8 +143,8 @@ export default function PlaylistsPage() {
       setDuplicatePlaylist(null);
       loadPlaylists(true);
     } catch (error) {
-      console.error('Erro ao duplicar playlist:', error);
-      alert('Erro ao duplicar playlist');
+      console.error("Erro ao duplicar playlist:", error);
+      alert("Erro ao duplicar playlist");
     }
   };
 
@@ -136,7 +152,10 @@ export default function PlaylistsPage() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold text-gray-900">Playlists</h1>
-        <Link to="/playlists/new" className="btn-primary flex items-center space-x-2">
+        <Link
+          to="/playlists/new"
+          className="btn-primary flex items-center space-x-2"
+        >
           <Plus size={20} />
           <span>Nova Playlist</span>
         </Link>
@@ -145,7 +164,10 @@ export default function PlaylistsPage() {
       {/* Search Bar */}
       <form onSubmit={handleSearch} className="flex gap-2">
         <div className="flex-1 relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+          <Search
+            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+            size={20}
+          />
           <input
             type="text"
             placeholder="Buscar playlist por nome ou descrição..."
@@ -167,7 +189,10 @@ export default function PlaylistsPage() {
         <div className="text-center py-12">
           <ListIcon size={64} className="mx-auto text-gray-300 mb-4" />
           <p className="text-gray-600 mb-4">Nenhuma playlist criada ainda</p>
-          <Link to="/playlists/new" className="btn-primary inline-flex items-center space-x-2">
+          <Link
+            to="/playlists/new"
+            className="btn-primary inline-flex items-center space-x-2"
+          >
             <Plus size={20} />
             <span>Criar Primeira Playlist</span>
           </Link>
@@ -175,7 +200,10 @@ export default function PlaylistsPage() {
       ) : (
         <div className="grid gap-4">
           {playlists.map((playlist) => (
-            <div key={playlist.id} className="card hover:shadow-lg transition-shadow">
+            <div
+              key={playlist.id}
+              className="card hover:shadow-lg transition-shadow"
+            >
               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
                 <div className="flex-1 min-w-0">
                   <Link
@@ -185,10 +213,13 @@ export default function PlaylistsPage() {
                     {playlist.name}
                   </Link>
                   {playlist.description && (
-                    <p className="text-gray-600 mt-1 break-words">{playlist.description}</p>
+                    <p className="text-gray-600 mt-1 break-words">
+                      {playlist.description}
+                    </p>
                   )}
                   <p className="text-sm text-gray-500 mt-2">
-                    {playlist.songs.length} {playlist.songs.length === 1 ? 'música' : 'músicas'}
+                    {playlist.songs.length}{" "}
+                    {playlist.songs.length === 1 ? "música" : "músicas"}
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -210,13 +241,16 @@ export default function PlaylistsPage() {
                     <span className="sm:hidden">Dup</span>
                   </button>
                   <button
-                    onClick={() => handleGeneratePDF(playlist)}
-                    disabled={generatingPDF === playlist.id || playlist.songs.length === 0}
+                    onClick={() => setPdfOptionsPlaylist(playlist)}
+                    disabled={
+                      generatingPDF === playlist.id ||
+                      playlist.songs.length === 0
+                    }
                     className="px-3 py-2 text-xs sm:text-sm bg-green-100 text-green-700 hover:bg-green-200 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1 sm:space-x-2"
                   >
                     <FileDown size={16} className="flex-shrink-0" />
                     <span>
-                      {generatingPDF === playlist.id ? 'Gerando...' : 'PDF'}
+                      {generatingPDF === playlist.id ? "Gerando..." : "PDF"}
                     </span>
                   </button>
                   <Link
@@ -235,11 +269,13 @@ export default function PlaylistsPage() {
               </div>
             </div>
           ))}
-          
+
           {/* Scroll Trigger */}
           <div ref={observerTarget} className="py-4 text-center">
             {loadingMore && <p className="text-gray-600">Carregando mais...</p>}
-            {!hasMore && playlists.length > 0 && <p className="text-gray-400">Fim da lista</p>}
+            {!hasMore && playlists.length > 0 && (
+              <p className="text-gray-400">Fim da lista</p>
+            )}
           </div>
         </div>
       )}
@@ -259,6 +295,48 @@ export default function PlaylistsPage() {
           onConfirm={handleDuplicate}
           onClose={() => setDuplicatePlaylist(null)}
         />
+      )}
+
+      {/* Modal de Opções de PDF */}
+      {pdfOptionsPlaylist && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+            <h3 className="text-xl font-bold mb-4">Baixar PDF</h3>
+            <p className="text-gray-600 mb-6">Escolha o formato do PDF:</p>
+            <div className="space-y-3">
+              <button
+                onClick={() => handleGeneratePDF(pdfOptionsPlaylist, true)}
+                className="w-full px-4 py-3 bg-blue-500 hover:bg-blue-700 text-white font-bold rounded text-left flex items-center gap-3"
+              >
+                <span className="text-2xl">🎸</span>
+                <div>
+                  <div className="font-bold">Com Cifras</div>
+                  <div className="text-sm opacity-90">
+                    Uma música por página
+                  </div>
+                </div>
+              </button>
+              <button
+                onClick={() => handleGeneratePDF(pdfOptionsPlaylist, false)}
+                className="w-full px-4 py-3 bg-green-500 hover:bg-green-700 text-white font-bold rounded text-left flex items-center gap-3"
+              >
+                <span className="text-2xl">📝</span>
+                <div>
+                  <div className="font-bold">Só Letras</div>
+                  <div className="text-sm opacity-90">
+                    Múltiplas músicas por página
+                  </div>
+                </div>
+              </button>
+            </div>
+            <button
+              onClick={() => setPdfOptionsPlaylist(null)}
+              className="w-full mt-4 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold rounded"
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );

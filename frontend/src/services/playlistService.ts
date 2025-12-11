@@ -1,10 +1,14 @@
-import api from '../lib/api';
-import { Playlist, CreatePlaylistDto, AddSongToPlaylistDto } from '../types';
+import api from "../lib/api";
+import { Playlist, CreatePlaylistDto, AddSongToPlaylistDto } from "../types";
 
 export const playlistService = {
   // Listar todas as playlists
-  async getAll(params?: { search?: string; skip?: number; take?: number }): Promise<Playlist[]> {
-    const response = await api.get('/playlists', { params });
+  async getAll(params?: {
+    search?: string;
+    skip?: number;
+    take?: number;
+  }): Promise<Playlist[]> {
+    const response = await api.get("/playlists", { params });
     return response.data;
   },
 
@@ -16,12 +20,15 @@ export const playlistService = {
 
   // Criar nova playlist
   async create(data: CreatePlaylistDto): Promise<Playlist> {
-    const response = await api.post('/playlists', data);
+    const response = await api.post("/playlists", data);
     return response.data;
   },
 
   // Atualizar playlist
-  async update(id: string, data: Partial<CreatePlaylistDto>): Promise<Playlist> {
+  async update(
+    id: string,
+    data: Partial<CreatePlaylistDto>
+  ): Promise<Playlist> {
     const response = await api.put(`/playlists/${id}`, data);
     return response.data;
   },
@@ -57,11 +64,14 @@ export const playlistService = {
   },
 
   // Gerar PDF da playlist
-  async generatePDF(playlistId: string): Promise<Blob> {
+  async generatePDF(
+    playlistId: string,
+    showChords: boolean = true
+  ): Promise<Blob> {
     const response = await api.post(
-      '/pdf/generate',
-      { playlistId },
-      { responseType: 'blob' }
+      "/pdf/generate",
+      { playlistId, showChords },
+      { responseType: "blob" }
     );
     return response.data;
   },
