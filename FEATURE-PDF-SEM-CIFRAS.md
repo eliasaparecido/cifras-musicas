@@ -128,9 +128,9 @@ if (!isFirstSong && yPosition + totalHeight > pageHeight - 20) {
 
 ### Otimizações no Modo Sem Cifras
 
-- `lineHeight`: 4.5 (vs 5 com cifras)
+- `lineHeight`: 5.5 (vs 5 com cifras) - mais espaçamento para melhor legibilidade
 - Fontes ligeiramente menores
-- Espaçamento de 12pt entre músicas
+- Espaçamento de 15pt entre músicas
 - Remove linhas vazias para economizar espaço
 
 ## Testes Sugeridos

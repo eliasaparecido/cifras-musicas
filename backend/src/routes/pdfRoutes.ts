@@ -49,7 +49,7 @@ router.post("/generate", async (req: Request, res: Response) => {
     const pageWidth = doc.internal.pageSize.width;
     const margin = 15;
     const contentWidth = pageWidth - margin * 2;
-    const lineHeight = showChords ? 5 : 4.5;
+    const lineHeight = showChords ? 5 : 5.5;
 
     if (showChords) {
       // MODO COM CIFRAS: uma música por página
@@ -169,7 +169,7 @@ router.post("/generate", async (req: Request, res: Response) => {
 
         // Adicionar espaçamento entre músicas (exceto a primeira)
         if (!isFirstSong) {
-          yPosition += 12;
+          yPosition += 15;
         }
 
         // Título e artista
