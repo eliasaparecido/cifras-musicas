@@ -139,7 +139,24 @@ export function normalizeLyrics(lyrics: string): string {
  * Senhor meu Deus, quando eu maravilhado
  */
 export function convertInlineToChordOverLyrics(lyrics: string): string {
-  const lines = lyrics.split("\n");
+  // Converte tags HTML de parágrafo em quebras de linha
+  let processedText = lyrics
+    .replace(/<\/p>/gi, '\n')  // Fecha parágrafo vira quebra de linha
+    .replace(/<p>/gi, '')       // Remove abertura de parágrafo
+    .replace(/<br\s*\/?>/gi, '\n');  // <br> vira quebra de linha
+  
+  // Remove tags HTML restantes (strong, em, etc)
+  processedText = processedText.replace(/<[^>]+>/g, '');
+  
+  // Remove &nbsp; e outras entidades HTML
+  processedText = processedText
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&')
+    .replace(/&quot;/g, '"');
+  
+  const lines = processedText.split("\n");
   const result: string[] = [];
 
   for (const line of lines) {
