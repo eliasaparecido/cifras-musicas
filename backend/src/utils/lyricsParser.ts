@@ -31,7 +31,6 @@ export function isChordOverLyrics(lyrics: string): boolean {
       }
     }
   }
-
   return false;
 }
 
