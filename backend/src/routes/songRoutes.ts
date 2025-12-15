@@ -78,9 +78,12 @@ router.get("/:id", async (req, res) => {
     let lyrics = song.lyrics;
     let currentKey = song.originalKey;
 
+    // Normaliza para formato inline se estiver em formato "chord-over-lyrics"
+    lyrics = normalizeLyrics(lyrics);
+
     // Se um tom diferente for solicitado, transpor
     if (key && key !== song.originalKey) {
-      lyrics = transposeLyrics(song.lyrics, song.originalKey, key as string);
+      lyrics = transposeLyrics(lyrics, song.originalKey, key as string);
       currentKey = key as string;
     }
 

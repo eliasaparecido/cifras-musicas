@@ -4,6 +4,7 @@ import { transposeLyrics } from "../utils/transposeUtils.js";
 import {
   convertInlineToChordOverLyrics,
   removeChords,
+  normalizeLyrics,
 } from "../utils/lyricsParser.js";
 import { parseHtmlToFormattedLines } from "../utils/htmlProcessor.js";
 import { jsPDF } from "jspdf";
@@ -133,11 +134,13 @@ router.post("/generate", async (req: Request, res: Response) => {
         const playlistSong = playlist.songs[i];
         const { song, key } = playlistSong;
 
+        // Normaliza para formato inline se estiver em formato "chord-over-lyrics"
+        let lyrics = normalizeLyrics(song.lyrics);
+
         // Transpor letra se necessário
-        let lyrics =
-          key !== song.originalKey
-            ? transposeLyrics(song.lyrics, song.originalKey, key)
-            : song.lyrics;
+        if (key !== song.originalKey) {
+          lyrics = transposeLyrics(lyrics, song.originalKey, key);
+        }
 
         // Converter para formato separado (cifras sobre letras)
         lyrics = convertInlineToChordOverLyrics(lyrics);
@@ -251,11 +254,13 @@ router.post("/generate", async (req: Request, res: Response) => {
         const playlistSong = playlist.songs[i];
         const { song, key } = playlistSong;
 
+        // Normaliza para formato inline se estiver em formato "chord-over-lyrics"
+        let lyrics = normalizeLyrics(song.lyrics);
+
         // Transpor letra se necessário
-        let lyrics =
-          key !== song.originalKey
-            ? transposeLyrics(song.lyrics, song.originalKey, key)
-            : song.lyrics;
+        if (key !== song.originalKey) {
+          lyrics = transposeLyrics(lyrics, song.originalKey, key);
+        }
 
         // Remover cifras
         lyrics = removeChords(lyrics);
