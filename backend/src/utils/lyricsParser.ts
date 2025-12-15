@@ -18,7 +18,7 @@ export function isChordOverLyrics(lyrics: string): boolean {
 
     if (words.length > 0) {
       const chordWords = words.filter((word) =>
-        /^[A-G](#|b)?(m|maj|dim|aug|sus)?(2|4|5|6|7|9|11|13)?$/.test(word)
+        /^[A-G](#|b)?(m|maj|min|dim|aug|sus|add)?[0-9]*(\/[A-G](#|b)?)?$/.test(word)
       );
 
       // Se mais de 50% das palavras são acordes, provavelmente é uma linha de acordes
@@ -59,7 +59,7 @@ export function convertChordOverLyricsToInline(lyrics: string): string {
       .split(/\s+/)
       .filter((w) => w.length > 0);
     const chordWords = words.filter((word) =>
-      /^[A-G](#|b)?(m|maj|dim|aug|sus)?(2|4|5|6|7|9|11|13)?$/.test(word)
+      /^[A-G](#|b)?(m|maj|min|dim|aug|sus|add)?[0-9]*(\/[A-G](#|b)?)?$/.test(word)
     );
 
     const isChordLine =
@@ -73,7 +73,7 @@ export function convertChordOverLyricsToInline(lyrics: string): string {
       let pos = 0;
       for (const word of currentLine.split(/(\s+)/)) {
         if (
-          /^[A-G](#|b)?(m|maj|dim|aug|sus)?(2|4|5|6|7|9|11|13)?$/.test(
+          /^[A-G](#|b)?(m|maj|min|dim|aug|sus|add)?[0-9]*(\/[A-G](#|b)?)?$/.test(
             word.trim()
           )
         ) {
