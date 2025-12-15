@@ -29,7 +29,13 @@ export function parseHtmlToFormattedLines(html: string): ProcessedLine[] {
 
   for (const line of tempLines) {
     const segments = parseLineSegments(line);
-    const raw = line.replace(/<[^>]+>/g, ''); // Remove todas as tags para texto puro
+    // Remove tags HTML mas preserva &nbsp; convertendo para espaços
+    let raw = line.replace(/<[^>]+>/g, '');
+    raw = raw.replace(/&nbsp;/g, ' '); // Converter &nbsp; de volta para espaço
+    raw = raw.replace(/&amp;/g, '&');
+    raw = raw.replace(/&lt;/g, '<');
+    raw = raw.replace(/&gt;/g, '>');
+    raw = raw.replace(/&quot;/g, '"');
     lines.push({ segments, raw });
   }
 
@@ -47,7 +53,8 @@ function parseLineSegments(line: string): TextSegment[] {
   let matches = line.match(regex);
   
   if (!matches) {
-    return [{ text: line }];
+    const text = decodeHtmlEntities(line);
+    return [{ text }];
   }
 
   let currentBold = false;
@@ -59,7 +66,7 @@ function parseLineSegments(line: string): TextSegment[] {
     if (match === '<b>' || match === '<strong>') {
       if (buffer) {
         segments.push({
-          text: buffer,
+          text: decodeHtmlEntities(buffer),
           bold: currentBold,
           italic: currentItalic,
           underline: currentUnderline,
@@ -70,7 +77,7 @@ function parseLineSegments(line: string): TextSegment[] {
     } else if (match === '</b>' || match === '</strong>') {
       if (buffer) {
         segments.push({
-          text: buffer,
+          text: decodeHtmlEntities(buffer),
           bold: currentBold,
           italic: currentItalic,
           underline: currentUnderline,
@@ -81,7 +88,7 @@ function parseLineSegments(line: string): TextSegment[] {
     } else if (match === '<i>' || match === '<em>') {
       if (buffer) {
         segments.push({
-          text: buffer,
+          text: decodeHtmlEntities(buffer),
           bold: currentBold,
           italic: currentItalic,
           underline: currentUnderline,
@@ -92,7 +99,7 @@ function parseLineSegments(line: string): TextSegment[] {
     } else if (match === '</i>' || match === '</em>') {
       if (buffer) {
         segments.push({
-          text: buffer,
+          text: decodeHtmlEntities(buffer),
           bold: currentBold,
           italic: currentItalic,
           underline: currentUnderline,
@@ -103,7 +110,7 @@ function parseLineSegments(line: string): TextSegment[] {
     } else if (match === '<u>') {
       if (buffer) {
         segments.push({
-          text: buffer,
+          text: decodeHtmlEntities(buffer),
           bold: currentBold,
           italic: currentItalic,
           underline: currentUnderline,
@@ -114,7 +121,7 @@ function parseLineSegments(line: string): TextSegment[] {
     } else if (match === '</u>') {
       if (buffer) {
         segments.push({
-          text: buffer,
+          text: decodeHtmlEntities(buffer),
           bold: currentBold,
           italic: currentItalic,
           underline: currentUnderline,
@@ -131,7 +138,7 @@ function parseLineSegments(line: string): TextSegment[] {
   // Adicionar buffer final
   if (buffer) {
     segments.push({
-      text: buffer,
+      text: decodeHtmlEntities(buffer),
       bold: currentBold,
       italic: currentItalic,
       underline: currentUnderline,
@@ -139,6 +146,19 @@ function parseLineSegments(line: string): TextSegment[] {
   }
 
   return segments.length > 0 ? segments : [{ text: '' }];
+}
+
+/**
+ * Decodifica entidades HTML (preservando espaços)
+ */
+function decodeHtmlEntities(text: string): string {
+  return text
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'");
 }
 
 /**

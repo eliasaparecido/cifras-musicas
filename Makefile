@@ -35,6 +35,10 @@ studio: ## Abre o Prisma Studio
 seed: ## Adiciona dados de exemplo no banco
 	docker-compose exec backend npx prisma db seed
 
+migrate-lyrics: ## Migra letras antigas para o novo formato (preserva espaços)
+	docker-compose exec backend npm run build
+	docker-compose exec backend node migrate-lyrics.js
+
 setup: build upd migrate ## Setup completo do projeto
 	@echo "✅ Projeto configurado com sucesso!"
 	@echo "📱 Frontend: http://localhost:5173"
