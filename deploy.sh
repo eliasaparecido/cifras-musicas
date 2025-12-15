@@ -112,3 +112,4 @@ echo ""
 print_warning "Aguarde alguns segundos para os serviços inicializarem completamente."
 echo ""
 
+
