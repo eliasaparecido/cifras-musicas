@@ -78,31 +78,19 @@ router.get("/:id", async (req, res) => {
     let lyrics = song.lyrics;
     let currentKey = song.originalKey;
 
-    console.log('=== SONG TRANSPOSITION DEBUG ===');
-    console.log('Song ID:', id);
-    console.log('Original Key:', song.originalKey);
-    console.log('Requested Key:', key);
-    console.log('Original lyrics (first 100 chars):', lyrics.substring(0, 100));
-
-    // Normaliza para formato inline se estiver em formato "chord-over-lyrics"
+    // Normaliza para formato inline se estiver em formato "chord-over-lyrics" ou HTML
     lyrics = normalizeLyrics(lyrics);
-    console.log('After normalize (first 100 chars):', lyrics.substring(0, 100));
 
     // Se um tom diferente for solicitado, transpor
     if (key && key !== song.originalKey) {
-      console.log('Transposing from', song.originalKey, 'to', key);
       lyrics = transposeLyrics(lyrics, song.originalKey, key as string);
       currentKey = key as string;
-      console.log('After transpose (first 100 chars):', lyrics.substring(0, 100));
     }
 
     // Se formato 'separated' for solicitado, converter para linhas separadas
     if (format === "separated") {
       lyrics = convertInlineToChordOverLyrics(lyrics);
-      console.log('After convert to separated (first 100 chars):', lyrics.substring(0, 100));
     }
-
-    console.log('=================================');
 
     res.json({
       ...song,

@@ -109,10 +109,40 @@ export function convertChordOverLyricsToInline(lyrics: string): string {
 }
 
 /**
+ * Remove HTML e converte para texto puro
+ * Preserva a estrutura mas remove todas as tags
+ */
+function stripHtmlTags(html: string): string {
+  // Converte tags de parágrafo em quebras de linha
+  let text = html
+    .replace(/<\/p>/gi, '\n')
+    .replace(/<p>/gi, '')
+    .replace(/<br\s*\/?>/gi, '\n');
+  
+  // Remove todas as outras tags HTML
+  text = text.replace(/<[^>]+>/g, '');
+  
+  // Converte entidades HTML
+  text = text
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&')
+    .replace(/&quot;/g, '"');
+  
+  return text;
+}
+
+/**
  * Normaliza a entrada do usuário para o formato padrão
- * Aceita tanto formato inline quanto linhas separadas
+ * Aceita tanto formato inline quanto linhas separadas, e também HTML
  */
 export function normalizeLyrics(lyrics: string): string {
+  // Se contém HTML, primeiro remove as tags
+  if (lyrics.includes('<') && lyrics.includes('>')) {
+    lyrics = stripHtmlTags(lyrics);
+  }
+
   // Se já está no formato inline, retorna como está
   if (lyrics.includes("[") && lyrics.includes("]")) {
     return lyrics;
