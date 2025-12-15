@@ -206,7 +206,7 @@ router.post('/:id/duplicate', async (req, res) => {
         name: validatedData.name,
         description: originalPlaylist.description,
         songs: {
-          create: originalPlaylist.songs.map((song) => ({
+          create: originalPlaylist.songs.map((song: any) => ({
             songId: song.songId,
             key: song.key,
             order: song.order,

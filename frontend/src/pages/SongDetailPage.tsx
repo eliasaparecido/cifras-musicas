@@ -166,7 +166,10 @@ export default function SongDetailPage() {
         </div>
 
         <div className="bg-gray-50 p-4 rounded-lg overflow-x-auto">
-          <pre className="lyrics-display">{song.lyrics}</pre>
+          <div 
+            className="lyrics-display font-mono text-sm whitespace-pre-wrap"
+            dangerouslySetInnerHTML={{ __html: song.lyrics }}
+          />
         </div>
       </div>
 

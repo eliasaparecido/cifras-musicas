@@ -33,7 +33,7 @@ router.post('/extract', upload.single('image'), async (req, res) => {
     
     // Configurar para melhor reconhecimento de layout
     await worker.setParameters({
-      tessedit_pageseg_mode: '6', // Assume bloco uniforme de texto
+      tessedit_pageseg_mode: '6' as any, // Assume bloco uniforme de texto
       preserve_interword_spaces: '1',
     });
 

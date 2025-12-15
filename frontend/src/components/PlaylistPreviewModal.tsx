@@ -13,7 +13,6 @@ export default function PlaylistPreviewModal({
   onClose,
 }: PlaylistPreviewModalProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [isFullscreen, setIsFullscreen] = useState(false);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
@@ -63,15 +62,6 @@ export default function PlaylistPreviewModal({
     };
   }, [playlist.id, showChords]);
 
-  useEffect(() => {
-    const handleFullscreenChange = () => {
-      setIsFullscreen(!!document.fullscreenElement);
-    };
-
-    document.addEventListener("fullscreenchange", handleFullscreenChange);
-    return () =>
-      document.removeEventListener("fullscreenchange", handleFullscreenChange);
-  }, []);
 
   const toggleFullscreen = async () => {
     if (!containerRef.current) return;

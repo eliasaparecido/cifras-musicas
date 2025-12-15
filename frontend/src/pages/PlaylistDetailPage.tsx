@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { playlistService } from "../services/playlistService";
 import { songService } from "../services/songService";
-import { Playlist, Song, PlaylistSong } from "../types";
+import { Playlist, Song } from "../types";
 import PlaylistPreviewModal from "../components/PlaylistPreviewModal";
 
 const KEYS = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];

@@ -214,7 +214,7 @@ router.delete("/:id", async (req, res) => {
 
     if (playlistSongs.length > 0) {
       const playlistNames = playlistSongs
-        .map((ps) => ps.playlist.name)
+        .map((ps: any) => ps.playlist.name)
         .join(", ");
       return res.status(400).json({
         error: "Não é possível excluir esta música",
