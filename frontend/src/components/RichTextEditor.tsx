@@ -6,7 +6,7 @@ import { useEffect } from 'react';
 
 interface RichTextEditorProps {
   value: string;
-  onChange: (value: string);
+  onChange: (value: string) => void;
   placeholder?: string;
   disabled?: boolean;
 }
