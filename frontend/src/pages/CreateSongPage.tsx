@@ -48,6 +48,10 @@ export default function CreateSongPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    console.log('=== CreateSongPage handleSubmit ===');
+    console.log('FormData sendo enviado:', formData);
+    console.log('Lyrics:', formData.lyrics);
+    
     if (!formData.title || !formData.artist || !formData.lyrics) {
       alert('Preencha todos os campos obrigatórios');
       return;
@@ -56,8 +60,10 @@ export default function CreateSongPage() {
     try {
       setLoading(true);
       if (id) {
+        console.log('Atualizando música ID:', id);
         await songService.update(id, formData);
       } else {
+        console.log('Criando nova música');
         await songService.create(formData);
       }
       navigate('/songs');

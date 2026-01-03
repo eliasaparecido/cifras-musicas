@@ -200,10 +200,10 @@ export function convertInlineToChordOverLyrics(lyrics: string): string {
       continue;
     }
 
-    // Extrair acordes e suas posições
+    // Extrair acordes e suas posições, preservando HTML
     const chords: Array<{ pos: number; chord: string }> = [];
     let cleanLyric = "";
-    let currentPos = 0;
+    let currentPos = 0; // Posição visual (sem contar tags HTML)
     let i = 0;
 
     while (i < line.length) {
@@ -214,6 +214,37 @@ export function convertInlineToChordOverLyrics(lyrics: string): string {
           const chord = line.substring(i + 1, endIndex);
           chords.push({ pos: currentPos, chord });
           i = endIndex + 1;
+        } else {
+          cleanLyric += line[i];
+          currentPos++;
+          i++;
+        }
+      } else if (line[i] === "<") {
+        // Encontrou tag HTML - preservar mas não contar na posição visual
+        const tagEnd = line.indexOf(">", i);
+        if (tagEnd !== -1) {
+          const tag = line.substring(i, tagEnd + 1);
+          cleanLyric += tag;
+          i = tagEnd + 1;
+          // NÃO incrementa currentPos - tags HTML não ocupam espaço visual
+        } else {
+          cleanLyric += line[i];
+          currentPos++;
+          i++;
+        }
+      } else if (line.substring(i).startsWith("&nbsp;")) {
+        // Preservar &nbsp; e contar como 1 espaço visual
+        cleanLyric += "&nbsp;";
+        currentPos++;
+        i += 6; // Pula "&nbsp;"
+      } else if (line.substring(i).startsWith("&")) {
+        // Outras entidades HTML (&amp;, &lt;, etc)
+        const entityEnd = line.indexOf(";", i);
+        if (entityEnd !== -1) {
+          const entity = line.substring(i, entityEnd + 1);
+          cleanLyric += entity;
+          currentPos++; // Conta como 1 caractere visual
+          i = entityEnd + 1;
         } else {
           cleanLyric += line[i];
           currentPos++;
@@ -232,7 +263,7 @@ export function convertInlineToChordOverLyrics(lyrics: string): string {
       continue;
     }
 
-    // Criar linha de acordes
+    // Criar linha de acordes (sem HTML)
     let chordLine = "";
     let lastPos = 0;
 
@@ -243,7 +274,7 @@ export function convertInlineToChordOverLyrics(lyrics: string): string {
       lastPos = pos + chord.length;
     }
 
-    // Adicionar linha de acordes e linha de letra
+    // Adicionar linha de acordes e linha de letra (com HTML preservado)
     result.push(chordLine);
     result.push(cleanLyric);
   }

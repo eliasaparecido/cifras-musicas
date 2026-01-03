@@ -34,11 +34,16 @@ export default function RichTextEditor({ value, onChange, placeholder, disabled 
       // Pegar HTML do editor
       let html = editor.getHTML();
       
+      console.log('=== RichTextEditor onUpdate ===');
+      console.log('HTML original:', html);
+      
       // Preservar espaços múltiplos convertendo para &nbsp;
       // Converter sequências de 2+ espaços para &nbsp;
       html = html.replace(/ {2,}/g, (match) => {
         return '&nbsp;'.repeat(match.length);
       });
+      
+      console.log('HTML após conversão:', html);
       
       onChange(html);
     },
@@ -90,12 +95,18 @@ export default function RichTextEditor({ value, onChange, placeholder, disabled 
   // Atualizar conteúdo quando value mudar externamente
   useEffect(() => {
     if (editor && value !== editor.getHTML()) {
+      console.log('=== RichTextEditor useEffect ===');
+      console.log('Value recebido:', value);
+      console.log('HTML atual do editor:', editor.getHTML());
+      
       // Converter &nbsp; de volta para espaços non-breaking (U+00A0) ao carregar no editor
       // Isso permite que o editor mostre e mantenha os espaços
       let content = value || '';
       
       // Manter &nbsp; como está para o editor processar corretamente
       editor.commands.setContent(content, false);
+      
+      console.log('HTML após setContent:', editor.getHTML());
     }
   }, [value, editor]);
 

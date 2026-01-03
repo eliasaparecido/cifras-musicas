@@ -67,6 +67,9 @@ router.get("/:id", async (req, res) => {
     const { id } = req.params;
     const { key, format } = req.query;
 
+    console.log(`=== GET /api/songs/${id} ===`);
+    console.log('Query params:', { key, format });
+
     const song = await prisma.song.findUnique({
       where: { id },
     });
@@ -75,21 +78,27 @@ router.get("/:id", async (req, res) => {
       return res.status(404).json({ error: "Música não encontrada" });
     }
 
+    console.log('Lyrics do banco:', song.lyrics.substring(0, 200));
+
     let lyrics = song.lyrics;
     let currentKey = song.originalKey;
 
     // Normaliza para formato inline se estiver em formato "chord-over-lyrics" ou HTML
     lyrics = normalizeLyrics(lyrics);
+    
+    console.log('Lyrics após normalização:', lyrics.substring(0, 200));
 
     // Se um tom diferente for solicitado, transpor
     if (key && key !== song.originalKey) {
       lyrics = transposeLyrics(lyrics, song.originalKey, key as string);
       currentKey = key as string;
+      console.log('Lyrics após transposição:', lyrics.substring(0, 200));
     }
 
     // Se formato 'separated' for solicitado, converter para linhas separadas
     if (format === "separated") {
       lyrics = convertInlineToChordOverLyrics(lyrics);
+      console.log('Lyrics após conversão para separated:', lyrics.substring(0, 200));
     }
 
     res.json({
@@ -106,10 +115,16 @@ router.get("/:id", async (req, res) => {
 // POST /api/songs - Criar nova música
 router.post("/", async (req, res) => {
   try {
+    console.log('=== POST /api/songs ===');
+    console.log('Body recebido:', JSON.stringify(req.body, null, 2));
+    console.log('Lyrics original:', req.body.lyrics);
+    
     const validatedData = createSongSchema.parse(req.body);
 
     // Normaliza a letra (aceita formato inline ou linhas separadas)
     const normalizedLyrics = normalizeLyrics(validatedData.lyrics);
+    
+    console.log('Lyrics após normalização:', normalizedLyrics);
 
     const song = await prisma.song.create({
       data: {
@@ -117,6 +132,8 @@ router.post("/", async (req, res) => {
         lyrics: normalizedLyrics,
       },
     });
+    
+    console.log('Música salva:', song.id);
 
     res.status(201).json(song);
   } catch (error) {
