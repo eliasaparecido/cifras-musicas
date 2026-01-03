@@ -31,10 +31,11 @@ export default function RichTextEditor({ value, onChange, placeholder, disabled 
     content: value,
     editable: !disabled,
     onUpdate: ({ editor }) => {
-      // Preservar espaços múltiplos convertendo para &nbsp;
+      // Pegar HTML do editor
       let html = editor.getHTML();
       
-      // Converter múltiplos espaços em &nbsp; para preservar alinhamento
+      // Preservar espaços múltiplos convertendo para &nbsp;
+      // Converter sequências de 2+ espaços para &nbsp;
       html = html.replace(/ {2,}/g, (match) => {
         return '&nbsp;'.repeat(match.length);
       });

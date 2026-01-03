@@ -182,15 +182,8 @@ export function convertInlineToChordOverLyrics(lyrics: string): string {
     .replace(/<p>/gi, '')       // Remove abertura de parágrafo
     .replace(/<br\s*\/?>/gi, '\n');  // <br> vira quebra de linha
   
-  // Remove APENAS tags de formatação específicas, preservando o conteúdo
-  processedText = processedText
-    .replace(/<\/?strong>/gi, '')
-    .replace(/<\/?b>/gi, '')
-    .replace(/<\/?em>/gi, '')
-    .replace(/<\/?i>/gi, '')
-    .replace(/<\/?u>/gi, '');
-  
-  // PRESERVAR &nbsp; para manter espaçamento, apenas decodificar outras entidades
+  // NÃO remover tags de formatação! Elas devem ser preservadas!
+  // Apenas decodificar entidades HTML (exceto &nbsp;)
   processedText = processedText
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
