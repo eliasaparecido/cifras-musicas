@@ -23,7 +23,7 @@ function renderFormattedText(
 ): number {
   const { bold, italic, underline, maxWidth } = options;
 
-  // Configurar estilo da fonte
+  // Configurar estilo da fonte - usar Helvetica para suportar bold/italic
   let fontStyle = "normal";
   if (bold && italic) {
     fontStyle = "bolditalic";
@@ -33,7 +33,7 @@ function renderFormattedText(
     fontStyle = "italic";
   }
 
-  doc.setFont("courier", fontStyle);
+  doc.setFont("helvetica", fontStyle);
 
   // Renderizar texto
   doc.text(text, x, y, { maxWidth });

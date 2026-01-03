@@ -167,8 +167,8 @@ export default function SongDetailPage() {
 
         <div className="bg-gray-50 p-4 rounded-lg overflow-x-auto">
           <div 
-            className="lyrics-display font-mono text-sm"
-            style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}
+            className="lyrics-display text-sm"
+            style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word', fontFamily: 'Arial, sans-serif', lineHeight: '1.6' }}
             dangerouslySetInnerHTML={{ __html: song.lyrics }}
           />
         </div>
