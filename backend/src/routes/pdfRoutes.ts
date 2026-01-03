@@ -23,19 +23,16 @@ function renderFormattedText(
 ): number {
   const { bold, italic, underline, maxWidth } = options;
 
-  // Configurar estilo da fonte - usar Helvetica para suportar bold/italic
-  let fontStyle = "normal";
-  if (bold && italic) {
-    fontStyle = "bolditalic";
-  } else if (bold) {
-    fontStyle = "bold";
-  } else if (italic) {
-    fontStyle = "italic";
-  }
-
-  doc.setFont("helvetica", fontStyle);
+  // Configurar estilo da fonte
+  // Usar courier para manter alinhamento, mas simular negrito com strokeText
+  doc.setFont("courier", "normal");
 
   // Renderizar texto
+  if (bold) {
+    // Simular negrito com texto mais grosso
+    doc.setFont("courier", "bold");
+  }
+  
   doc.text(text, x, y, { maxWidth });
 
   // Adicionar sublinhado se necessário

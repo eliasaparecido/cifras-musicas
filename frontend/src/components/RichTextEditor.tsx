@@ -64,8 +64,13 @@ export default function RichTextEditor({ value, onChange, placeholder, disabled 
   // Atualizar conteúdo quando value mudar externamente
   useEffect(() => {
     if (editor && value !== editor.getHTML()) {
-      // Preservar o conteúdo formatado (HTML) exatamente como está
-      const content = value || '';
+      // Converter &nbsp; de volta para espaços normais ao carregar no editor
+      // para que o usuário possa editar normalmente
+      let content = value || '';
+      
+      // Substituir &nbsp; por espaços normais antes de carregar no editor
+      content = content.replace(/&nbsp;/g, ' ');
+      
       editor.commands.setContent(content, false);
     }
   }, [value, editor]);

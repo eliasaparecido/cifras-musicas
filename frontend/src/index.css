@@ -36,11 +36,26 @@
     font-family: 'Roboto Mono', 'Courier New', Courier, monospace;
     font-size: 0.875rem;
     line-height: 1.6;
-    white-space: pre;
+    white-space: pre-wrap;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     max-width: 100%;
     tab-size: 2;
     letter-spacing: 0;
+  }
+  
+  /* Garantir que negrito funcione em fonte monoespaçada */
+  .lyrics-display strong,
+  .lyrics-display b {
+    font-weight: 700 !important;
+  }
+  
+  .lyrics-display em,
+  .lyrics-display i {
+    font-style: italic !important;
+  }
+  
+  .lyrics-display u {
+    text-decoration: underline !important;
   }
 }
