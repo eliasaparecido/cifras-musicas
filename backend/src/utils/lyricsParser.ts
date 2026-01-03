@@ -138,9 +138,17 @@ function stripHtmlTags(html: string): string {
  * Aceita tanto formato inline quanto linhas separadas, e também HTML
  */
 export function normalizeLyrics(lyrics: string): string {
-  // Se contém HTML, primeiro remove as tags
+  // Se contém HTML, preservar as tags de formatação (strong, em, u, b, i)
+  // Apenas normalizar quebras de linha e parágrafos
   if (lyrics.includes('<') && lyrics.includes('>')) {
-    lyrics = stripHtmlTags(lyrics);
+    // Normalizar quebras de linha mas preservar formatação
+    let normalized = lyrics
+      .replace(/<\/p>/gi, '\n')
+      .replace(/<p>/gi, '')
+      .replace(/<br\s*\/?>/gi, '\n');
+    
+    // Já está em formato HTML com formatação, retornar preservando tags
+    return normalized;
   }
 
   // Se já está no formato inline, retorna como está
@@ -174,12 +182,16 @@ export function convertInlineToChordOverLyrics(lyrics: string): string {
     .replace(/<p>/gi, '')       // Remove abertura de parágrafo
     .replace(/<br\s*\/?>/gi, '\n');  // <br> vira quebra de linha
   
-  // Remove tags HTML restantes (strong, em, etc)
-  processedText = processedText.replace(/<[^>]+>/g, '');
-  
-  // Remove &nbsp; e outras entidades HTML
+  // Remove APENAS tags de formatação específicas, preservando o conteúdo
   processedText = processedText
-    .replace(/&nbsp;/g, ' ')
+    .replace(/<\/?strong>/gi, '')
+    .replace(/<\/?b>/gi, '')
+    .replace(/<\/?em>/gi, '')
+    .replace(/<\/?i>/gi, '')
+    .replace(/<\/?u>/gi, '');
+  
+  // PRESERVAR &nbsp; para manter espaçamento, apenas decodificar outras entidades
+  processedText = processedText
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
     .replace(/&amp;/g, '&')

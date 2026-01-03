@@ -6,7 +6,7 @@ import { useEffect } from 'react';
 
 interface RichTextEditorProps {
   value: string;
-  onChange: (value: string) => void;
+  onChange: (value: string);
   placeholder?: string;
   disabled?: boolean;
 }
@@ -53,10 +53,35 @@ export default function RichTextEditor({ value, onChange, placeholder, disabled 
         });
       },
       transformPastedText(text) {
-        // Preservar espaços ao colar texto puro
-        return text.replace(/ {2,}/g, (match) => {
-          return '\u00A0'.repeat(match.length); // Non-breaking space
+        // Preservar espaços ao colar texto puro - converter para &nbsp; em HTML
+        const escaped = text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        return escaped.replace(/ {2,}/g, (match) => {
+          return '&nbsp;'.repeat(match.length);
         });
+      },
+      handleKeyDown: (view, event) => {
+        // Interceptar espaço e inserir &nbsp; quando múltiplos espaços
+        if (event.key === ' ') {
+          const { state } = view;
+          const { selection } = state;
+          const { $from } = selection;
+          
+          // Pegar texto antes do cursor
+          const textBefore = $from.parent.textContent.substring(0, $from.parentOffset);
+          
+          // Se o último caractere é um espaço, inserir &nbsp; ao invés de espaço normal
+          if (textBefore.endsWith(' ') || textBefore.endsWith('\u00A0')) {
+            event.preventDefault();
+            
+            // Inserir non-breaking space usando HTML
+            const { tr } = state;
+            const nbspNode = state.schema.text('\u00A0');
+            view.dispatch(tr.replaceSelectionWith(nbspNode, false));
+            
+            return true;
+          }
+        }
+        return false;
       },
     },
   });
@@ -64,13 +89,11 @@ export default function RichTextEditor({ value, onChange, placeholder, disabled 
   // Atualizar conteúdo quando value mudar externamente
   useEffect(() => {
     if (editor && value !== editor.getHTML()) {
-      // Converter &nbsp; de volta para espaços normais ao carregar no editor
-      // para que o usuário possa editar normalmente
+      // Converter &nbsp; de volta para espaços non-breaking (U+00A0) ao carregar no editor
+      // Isso permite que o editor mostre e mantenha os espaços
       let content = value || '';
       
-      // Substituir &nbsp; por espaços normais antes de carregar no editor
-      content = content.replace(/&nbsp;/g, ' ');
-      
+      // Manter &nbsp; como está para o editor processar corretamente
       editor.commands.setContent(content, false);
     }
   }, [value, editor]);
@@ -154,6 +177,7 @@ export default function RichTextEditor({ value, onChange, placeholder, disabled 
         
         .ProseMirror p {
           margin: 0;
+          white-space: pre-wrap;
         }
         
         .ProseMirror strong,

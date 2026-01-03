@@ -42,6 +42,7 @@
     max-width: 100%;
     tab-size: 2;
     letter-spacing: 0;
+    word-wrap: break-word;
   }
   
   /* Garantir que negrito funcione em fonte monoespaçada */
@@ -57,5 +58,11 @@
   
   .lyrics-display u {
     text-decoration: underline !important;
+  }
+  
+  /* Preservar espaços múltiplos */
+  .lyrics-display p {
+    margin: 0;
+    white-space: pre-wrap;
   }
 }
