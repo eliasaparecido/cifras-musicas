@@ -5,6 +5,7 @@ import {
   convertInlineToChordOverLyrics,
   removeChords,
   normalizeLyrics,
+  isChordLine,
 } from "../utils/lyricsParser.js";
 import { parseHtmlToFormattedLines } from "../utils/htmlProcessor.js";
 import { jsPDF } from "jspdf";
@@ -144,6 +145,17 @@ router.post("/generate", async (req: Request, res: Response) => {
 
         // Processar HTML para obter linhas formatadas
         const processedLines = parseHtmlToFormattedLines(lyrics);
+        
+        // Marcar linhas de cifras automaticamente como negrito
+        for (const line of processedLines) {
+          if (line.raw && isChordLine(line.raw)) {
+            // É uma linha de cifras - marcar todos os segmentos como negrito
+            for (const segment of line.segments) {
+              segment.bold = true;
+            }
+          }
+        }
+        
         const linesCount = processedLines.length;
 
         // Calcular altura necessária
