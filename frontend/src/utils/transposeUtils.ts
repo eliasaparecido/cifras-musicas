@@ -1,8 +1,6 @@
 /**
  * Sistema robusto de transposição de acordes musicais
- * Suporta acordes maiores, menores, com sétima, diminutos, aumentados, suspensos, etc.
- * Suporta notação com sustenidos (#) e bemóis (b)
- * Suporta acordes com baixo invertido (ex: C/G, Am/E)
+ * Trabalha com texto puro, identifica cifras automaticamente
  */
 
 // Escala cromática com sustenidos (formato interno - tudo maiúsculo)
@@ -28,6 +26,66 @@ const ENHARMONIC_EQUIVALENTS: Record<string, string> = {
   'B#': 'C',
   'CB': 'B',
 };
+
+/**
+ * Remove tags HTML e entidades, retornando texto puro
+ */
+export function stripHtml(html: string): string {
+  if (!html) return '';
+  
+  let text = html
+    .replace(/<\/p>/gi, '\n')
+    .replace(/<p>/gi, '')
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&')
+    .replace(/&quot;/g, '"');
+  
+  return text.trim();
+}
+
+/**
+ * Verifica se uma palavra é um acorde válido
+ * Apenas identifica como acorde se:
+ * 1. Começa com letra maiúscula A-G
+ * 2. É uma palavra isolada (não parte de frase)
+ */
+export function isChord(word: string): boolean {
+  const trimmed = word.trim();
+  
+  // Não pode ser vazio
+  if (!trimmed) return false;
+  
+  // Deve ter pelo menos 1 caractere
+  if (trimmed.length === 0) return false;
+  
+  // Padrão de acorde: DEVE começar com A-G MAIÚSCULO
+  const chordPattern = /^[A-G][#b]?(?:m|maj|min|dim|aug|sus|add)?[0-9]*(?:\/[A-G][#b]?)?$/;
+  
+  return chordPattern.test(trimmed);
+}
+
+/**
+ * Verifica se uma linha contém apenas acordes
+ */
+export function isChordLine(line: string): boolean {
+  const trimmed = line.trim();
+  if (!trimmed) return false;
+  
+  const words = trimmed.split(/\s+/);
+  
+  // Linha deve ter pelo menos 1 palavra
+  if (words.length === 0) return false;
+  
+  // Todas as palavras devem ser acordes E pelo menos uma deve ter mais de 1 caractere
+  const hasComplexChord = words.some(w => w.length > 1);
+  const allChords = words.every(word => isChord(word));
+  
+  return allChords && hasComplexChord;
+}
 
 /**
  * Converte formato externo (Eb, Bb) para interno (EB, BB)
@@ -176,126 +234,8 @@ function shouldPreferFlats(toKey: string): boolean {
 }
 
 /**
- * Transpõe um acorde de uma tonalidade para outra
- * Função principal para o frontend
- * @param chord - O acorde a transpor
- * @param fromKey - Tonalidade original
- * @param toKey - Tonalidade de destino
- */
-export function transposeChord(chord: string, fromKey: string, toKey: string): string {
-  const semitones = getSemitonesDifference(fromKey, toKey);
-  
-  if (semitones === 0) {
-    return chord;
-  }
-  
-  const preferFlat = shouldPreferFlats(toKey);
-  return transposeChordBySemitones(chord, semitones, preferFlat);
-}
-
-/**
- * Remove tags HTML de uma string, mantendo apenas o texto
- */
-function stripHtmlFromText(html: string): string {
-  return html.replace(/<[^>]+>/g, '');
-}
-
-/**
- * Extrai estrutura de tags HTML de um texto
- * Retorna um array de objetos {type: 'tag'|'text', content: string}
- */
-function parseHtmlStructure(html: string): Array<{ type: 'tag' | 'text', content: string }> {
-  const structure: Array<{ type: 'tag' | 'text', content: string }> = [];
-  const regex = /(<[^>]+>|[^<]+)/g;
-  let match;
-  
-  while ((match = regex.exec(html)) !== null) {
-    if (match[0].startsWith('<')) {
-      structure.push({ type: 'tag', content: match[0] });
-    } else {
-      structure.push({ type: 'text', content: match[0] });
-    }
-  }
-  
-  return structure;
-}
-
-/**
- * Transpõe um acorde que pode conter HTML (ex: [<strong>C</strong>m7])
- */
-function transposeChordWithHtml(
-  chordHtml: string,
-  semitones: number,
-  preferFlat: boolean
-): string {
-  // Se não tem tags HTML, transpõe normalmente
-  if (!chordHtml.includes('<')) {
-    return transposeChordBySemitones(chordHtml, semitones, preferFlat);
-  }
-  
-  // Extrai o texto puro do acorde
-  const plainChord = stripHtmlFromText(chordHtml);
-  
-  // Transpõe o acorde
-  const transposedChord = transposeChordBySemitones(plainChord, semitones, preferFlat);
-  
-  // Se o acorde transposto tem o mesmo comprimento, substitui caractere por caractere
-  if (plainChord.length === transposedChord.length) {
-    let result = chordHtml;
-    let plainIndex = 0;
-    
-    for (let i = 0; i < transposedChord.length; i++) {
-      // Encontra a próxima posição de texto (não tag) no HTML
-      while (plainIndex < result.length && result[plainIndex] === '<') {
-        // Pula a tag
-        const tagEnd = result.indexOf('>', plainIndex);
-        if (tagEnd === -1) break;
-        plainIndex = tagEnd + 1;
-      }
-      
-      if (plainIndex < result.length) {
-        result = result.substring(0, plainIndex) + transposedChord[i] + result.substring(plainIndex + 1);
-        plainIndex++;
-      }
-    }
-    
-    return result;
-  }
-  
-  // Se o comprimento mudou, reconstrói mantendo apenas as tags de formatação (não de posição)
-  const structure = parseHtmlStructure(chordHtml);
-  let transposedIndex = 0;
-  let resultParts: string[] = [];
-  
-  for (const part of structure) {
-    if (part.type === 'tag') {
-      // Mantém tags de formatação (strong, em, u, b, i)
-      if (/<\/?(?:strong|em|u|b|i)>/i.test(part.content)) {
-        resultParts.push(part.content);
-      }
-    } else {
-      // Substitui o texto pelo texto transposto
-      const textLength = part.content.length;
-      const transposedPart = transposedChord.substring(transposedIndex, transposedIndex + textLength);
-      resultParts.push(transposedPart);
-      transposedIndex += textLength;
-    }
-  }
-  
-  // Se sobraram caracteres do acorde transposto, adiciona no final
-  if (transposedIndex < transposedChord.length) {
-    resultParts.push(transposedChord.substring(transposedIndex));
-  }
-  
-  return resultParts.join('');
-}
-
-/**
- * Transpõe toda a letra da música preservando formatação HTML
- * Identifica acordes entre colchetes [Acorde] e transpõe
- * @param lyrics - A letra com acordes no formato [C]Letra [Am]mais letra (pode conter HTML)
- * @param fromKey - Tonalidade original (ex: "C", "Am")
- * @param toKey - Tonalidade de destino (ex: "G", "Em")
+ * Transpõe toda a letra da música (texto puro)
+ * INTELIGENTE: Apenas transpõe linhas que são claramente de acordes
  */
 export function transposeLyrics(lyrics: string, fromKey: string, toKey: string): string {
   const semitones = getSemitonesDifference(fromKey, toKey);
@@ -304,32 +244,78 @@ export function transposeLyrics(lyrics: string, fromKey: string, toKey: string):
     return lyrics;
   }
   
-  // Determina se deve usar bemóis ou sustenidos
   const preferFlat = shouldPreferFlats(toKey);
-  
-  // Regex para encontrar acordes entre colchetes, incluindo possíveis tags HTML dentro
-  // Captura tudo entre [ e ], incluindo tags HTML
-  const chordRegex = /\[([^\]]+?)\]/g;
-  
-  return lyrics.replace(chordRegex, (match, chordContent) => {
-    // Remove &nbsp; temporariamente para análise
-    const cleanContent = chordContent.replace(/&nbsp;/g, ' ');
+  const lines = lyrics.split("\n");
+  const result: string[] = [];
+
+  for (const line of lines) {
+    const trimmed = line.trim();
     
-    // Extrai o texto puro para verificar se é um acorde válido
-    const plainText = stripHtmlFromText(cleanContent).trim();
-    
-    // Verifica se parece com um acorde (começa com A-G)
-    if (!/^[A-G][#b]?/i.test(plainText)) {
-      // Não é um acorde, retorna como está
-      return match;
+    if (!trimmed) {
+      result.push(line);
+      continue;
     }
     
-    // Transpõe mantendo a estrutura HTML
-    const transposed = transposeChordWithHtml(cleanContent, semitones, preferFlat);
+    // Verificar se é uma linha de acordes
+    if (isChordLine(line)) {
+      // É linha de acordes - transpor
+      const words = line.split(/(\s+)/);
+      let transposedLine = '';
+      
+      for (const word of words) {
+        if (isChord(word)) {
+          transposedLine += transposeChordBySemitones(word.trim(), semitones, preferFlat);
+        } else {
+          transposedLine += word;
+        }
+      }
+      
+      result.push(transposedLine);
+    } else {
+      // Não é linha de acordes - manter como está
+      result.push(line);
+    }
+  }
+
+  return result.join("\n");
+}
+
+/**
+ * Renderiza a letra com acordes em HTML formatado
+ * Acordes são destacados em negrito
+ */
+export function renderLyricsAsHtml(lyrics: string): string {
+  const lines = lyrics.split("\n");
+  const result: string[] = [];
+
+  for (const line of lines) {
+    if (!line.trim()) {
+      result.push('<br/>');
+      continue;
+    }
     
-    // Restaura &nbsp; se necessário
-    return `[${transposed}]`;
-  });
+    if (isChordLine(line)) {
+      // Linha de acordes - coloca em negrito
+      const words = line.split(/(\s+)/);
+      let htmlLine = '';
+      
+      for (const word of words) {
+        if (isChord(word)) {
+          htmlLine += `<strong>${word}</strong>`;
+        } else {
+          // É espaço - preserva
+          htmlLine += word.replace(/ /g, '&nbsp;');
+        }
+      }
+      
+      result.push(htmlLine);
+    } else {
+      // Linha de letra - texto normal
+      result.push(line);
+    }
+  }
+
+  return result.join('<br/>');
 }
 
 /**

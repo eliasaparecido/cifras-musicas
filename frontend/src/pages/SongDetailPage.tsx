@@ -1,12 +1,23 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { ArrowLeft, Edit, Trash2, Music } from "lucide-react";
 import { songService } from "../services/songService";
 import { Song } from "../types";
+import { transposeLyrics, renderLyricsAsHtml, stripHtml } from "../utils/transposeUtils";
 
 const KEYS = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 const MINOR_KEYS = KEYS.map((k) => k + "m");
 const ALL_KEYS = [...KEYS, ...MINOR_KEYS];
+
+// Componente para renderizar letras (força re-render)
+function LyricsDisplay({ html, key: displayKey }: { html: string; key: string }) {
+  return (
+    <div 
+      className="lyrics-display"
+      dangerouslySetInnerHTML={{ __html: html }}
+    />
+  );
+}
 
 export default function SongDetailPage() {
   const { id } = useParams();
@@ -16,6 +27,7 @@ export default function SongDetailPage() {
   const [loading, setLoading] = useState(true);
   const [showTransposeModal, setShowTransposeModal] = useState(false);
   const [transposeKey, setTransposeKey] = useState("");
+  const [displayLyrics, setDisplayLyrics] = useState("");
 
   useEffect(() => {
     if (id) {
@@ -26,9 +38,25 @@ export default function SongDetailPage() {
   const loadSong = async (songId: string, key?: string) => {
     try {
       setLoading(true);
-      const data = await songService.getById(songId, key);
-      setSong(data);
-      setCurrentKey(key || data.originalKey);
+      const data = await songService.getById(songId);
+      
+      // Limpar HTML de dados antigos do banco
+      const cleanLyrics = stripHtml(data.lyrics);
+      
+      // Atualizar objeto da música com letra limpa
+      const cleanSong = { ...data, lyrics: cleanLyrics };
+      setSong(cleanSong);
+      
+      const targetKey = key || data.originalKey;
+      setCurrentKey(targetKey);
+      
+      // Transpor se necessário
+      const transposedLyrics = key && key !== data.originalKey
+        ? transposeLyrics(cleanLyrics, data.originalKey, key)
+        : cleanLyrics;
+      
+      // Renderizar como HTML para exibição
+      setDisplayLyrics(renderLyricsAsHtml(transposedLyrics));
     } catch (error) {
       console.error("Erro ao carregar música:", error);
       alert("Erro ao carregar música");
@@ -159,17 +187,14 @@ export default function SongDetailPage() {
             </select>
           </div>
           {currentKey !== song.originalKey && (
-            <p className="text-sm text-primary-600 font-medium">
+            <p className="text-sm text-primary-displayLnt-medium">
               ✓ Música transposta para {currentKey}
             </p>
           )}
         </div>
 
         <div className="bg-gray-50 p-4 rounded-lg overflow-x-auto">
-          <div 
-            className="lyrics-display"
-            dangerouslySetInnerHTML={{ __html: song.lyrics }}
-          />
+          <LyricsDisplay html={displayLyrics} key={currentKey} />
         </div>
       </div>
 

@@ -22,10 +22,8 @@ export const songService = {
   },
 
   // Buscar uma música específica
-  async getById(id: string, key?: string): Promise<Song> {
-    const response = await api.get(`/songs/${id}`, {
-      params: { key, format: "separated" },
-    });
+  async getById(id: string): Promise<Song> {
+    const response = await api.get(`/songs/${id}`);
     return response.data;
   },
 

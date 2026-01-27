@@ -328,11 +328,16 @@ function transposeChordWithHtml(
 }
 
 /**
- * Transpõe toda a letra da música preservando formatação HTML
- * Identifica acordes entre colchetes [Acorde] e transpõe
- * @param lyrics - A letra com acordes no formato [C]Letra [Am]mais letra (pode conter HTML)
- * @param fromKey - Tonalidade original (ex: "C", "Am")
- * @param toKey - Tonalidade de destino (ex: "G", "Em")
+ * Verifica se uma palavra é um acorde válido
+ */
+function isChord(word: string): boolean {
+  const trimmed = word.trim();
+  return /^[A-G][#b]?(?:m|maj|min|dim|aug|sus|add)?[0-9]*(?:\/[A-G][#b]?)?$/i.test(trimmed);
+}
+
+/**
+ * Transpõe toda a letra da música (texto puro)
+ * Identifica e transpõe acordes automaticamente
  */
 export function transposeLyrics(
   lyrics: string,
@@ -345,32 +350,37 @@ export function transposeLyrics(
     return lyrics;
   }
 
-  // Determina se deve usar bemóis ou sustenidos
   const preferFlat = shouldPreferFlats(toKey);
+  const lines = lyrics.split("\n");
+  const result: string[] = [];
 
-  // Regex para encontrar acordes entre colchetes, incluindo possíveis tags HTML dentro
-  // Captura tudo entre [ e ], incluindo tags HTML
-  const chordRegex = /\[([^\]]+?)\]/g;
-
-  return lyrics.replace(chordRegex, (match, chordContent) => {
-    // Remove &nbsp; temporariamente para análise
-    const cleanContent = chordContent.replace(/&nbsp;/g, ' ');
+  for (const line of lines) {
+    const trimmed = line.trim();
     
-    // Extrai o texto puro para verificar se é um acorde válido
-    const plainText = stripHtmlFromText(cleanContent).trim();
-    
-    // Verifica se parece com um acorde (começa com A-G)
-    if (!/^[A-G][#b]?/i.test(plainText)) {
-      // Não é um acorde, retorna como está
-      return match;
+    // Se a linha está vazia, mantém
+    if (!trimmed) {
+      result.push(line);
+      continue;
     }
     
-    // Transpõe mantendo a estrutura HTML
-    const transposed = transposeChordWithHtml(cleanContent, semitones, preferFlat);
+    // Divide a linha em palavras mantendo os espaços
+    const words = line.split(/(\s+)/);
+    let transposedLine = '';
     
-    // Restaura &nbsp; se necessário
-    return `[${transposed}]`;
-  });
+    for (const word of words) {
+      if (isChord(word)) {
+        // É um acorde, transpõe
+        transposedLine += transposeChord(word.trim(), semitones, preferFlat);
+      } else {
+        // Não é acorde, mantém como está
+        transposedLine += word;
+      }
+    }
+    
+    result.push(transposedLine);
+  }
+
+  return result.join("\n");
 }
 
 /**

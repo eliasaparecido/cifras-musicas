@@ -4,7 +4,6 @@ import { ArrowLeft, Save, Upload } from 'lucide-react';
 import { songService } from '../services/songService';
 import { CreateSongDto } from '../types';
 import api from '../lib/api';
-import RichTextEditor from '../components/RichTextEditor';
 
 const KEYS = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 const MINOR_KEYS = KEYS.map(k => k + 'm');
@@ -193,26 +192,30 @@ export default function CreateSongPage() {
             </div>
           </div>
           <p className="text-sm text-gray-500 mb-2">
-            Você pode digitar ou fazer upload de uma imagem com a cifra. Use a barra de ferramentas para formatar o texto.
+            Digite ou cole a cifra. Acordes serão identificados automaticamente.
           </p>
           <div className="bg-gray-50 p-3 rounded mb-2 text-xs">
-            <p className="font-semibold mb-1">Formato 1 - Inline (acordes no meio do texto):</p>
-            <code className="text-gray-700">[C]Exemplo de [G]letra com [Am]cifras [F]aqui...</code>
+            <p className="font-semibold mb-1">📝 Formato:</p>
+            <div className="font-mono bg-white p-2 rounded border">
+              <div className="text-blue-600">Gm&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Dm</div>
+              <div>A MESA SANTA QUE PREPARAMOS,</div>
+              <div className="text-blue-600 mt-2">Eb&nbsp;&nbsp;&nbsp;&nbsp;F&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Bb</div>
+              <div>MÃOS QUE SE ELEVAM A TI, Ó SENHOR</div>
+            </div>
             
-            <p className="font-semibold mt-3 mb-1">Formato 2 - Linhas separadas (mais fácil de copiar):</p>
-            <code className="text-gray-700">
-              C&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Am<br/>
-              Senhor meu Deus, quando eu maravilhado
-            </code>
-            
-            <p className="font-semibold mt-3 mb-1 text-purple-600">✨ Formatação de texto:</p>
-            <p className="text-gray-600">Use <b>negrito</b>, <i>itálico</i> e <u>sublinhado</u> para destacar partes importantes da letra</p>
+            <p className="font-semibold mt-3 mb-1 text-purple-600">✨ Dicas:</p>
+            <p className="text-gray-600">• Acordes em uma linha, letra na linha abaixo</p>
+            <p className="text-gray-600">• Use espaços para alinhar os acordes</p>
+            <p className="text-gray-600">• Sistema detecta acordes automaticamente</p>
+            <p className="text-gray-600">• Transposição funciona em tempo real!</p>
           </div>
-          <RichTextEditor
+          <textarea
             value={formData.lyrics}
-            onChange={(value) => setFormData({ ...formData, lyrics: value })}
-            placeholder="Cole sua música aqui em qualquer um dos formatos acima..."
+            onChange={(e) => setFormData({ ...formData, lyrics: e.target.value })}
+            placeholder="Cole sua música aqui...&#10;&#10;Exemplo:&#10;C           G&#10;Parabéns pra você&#10;Am          F&#10;Nesta data querida"
             disabled={loading}
+            className="input-field font-mono text-sm min-h-[400px] resize-y"
+            style={{ whiteSpace: 'pre', fontFamily: 'monospace' }}
           />
         </div>
 

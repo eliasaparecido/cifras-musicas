@@ -65,10 +65,6 @@ router.get("/", async (req, res) => {
 router.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const { key, format } = req.query;
-
-    console.log(`=== GET /api/songs/${id} ===`);
-    console.log('Query params:', { key, format });
 
     const song = await prisma.song.findUnique({
       where: { id },
@@ -78,34 +74,8 @@ router.get("/:id", async (req, res) => {
       return res.status(404).json({ error: "Música não encontrada" });
     }
 
-    console.log('Lyrics do banco:', song.lyrics.substring(0, 200));
-
-    let lyrics = song.lyrics;
-    let currentKey = song.originalKey;
-
-    // Normaliza para formato inline se estiver em formato "chord-over-lyrics" ou HTML
-    lyrics = normalizeLyrics(lyrics);
-    
-    console.log('Lyrics após normalização:', lyrics.substring(0, 200));
-
-    // Se um tom diferente for solicitado, transpor
-    if (key && key !== song.originalKey) {
-      lyrics = transposeLyrics(lyrics, song.originalKey, key as string);
-      currentKey = key as string;
-      console.log('Lyrics após transposição:', lyrics.substring(0, 200));
-    }
-
-    // Se formato 'separated' for solicitado, converter para linhas separadas
-    if (format === "separated") {
-      lyrics = convertInlineToChordOverLyrics(lyrics);
-      console.log('Lyrics após conversão para separated:', lyrics.substring(0, 200));
-    }
-
-    res.json({
-      ...song,
-      lyrics,
-      currentKey,
-    });
+    // Retorna a música como está (transposição será feita no frontend)
+    res.json(song);
   } catch (error) {
     console.error("Error fetching song:", error);
     res.status(500).json({ error: "Erro ao buscar música" });
