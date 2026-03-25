@@ -58,7 +58,7 @@ cifras-musicas/
 │   │   └── lib/         # Configurações (axios)
 │   ├── Dockerfile
 │   └── package.json
-├── docker-compose.yml   # Orquestração dos containers
+├── docker compose.yml   # Orquestração dos containers
 ├── Makefile            # Comandos facilitados
 └── README.md
 ```
@@ -125,10 +125,10 @@ make studio    # Abre o Prisma Studio (interface visual do banco)
 
 ```bash
 # 1. Construir e iniciar os containers
-docker-compose up --build -d
+docker compose up --build -d
 
 # 2. Executar as migrations do banco
-docker-compose exec backend npx prisma migrate dev --name init
+docker compose exec backend npx prisma migrate dev --name init
 
 # 3. Acessar a aplicação
 # Frontend: http://localhost:5173
@@ -139,18 +139,18 @@ docker-compose exec backend npx prisma migrate dev --name init
 
 ```bash
 # Parar os containers
-docker-compose down
+docker compose down
 
 # Ver logs
-docker-compose logs -f
+docker compose logs -f
 
 # Acessar o Prisma Studio (interface visual do banco)
-docker-compose exec backend npx prisma studio
+docker compose exec backend npx prisma studio
 # Acesse em: http://localhost:5555
 
 # Rebuild completo (se houver mudanças nas dependências)
-docker-compose down
-docker-compose up --build
+docker compose down
+docker compose up --build
 ```
 
 ## 📋 Funcionalidades

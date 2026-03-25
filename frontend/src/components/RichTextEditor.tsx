@@ -104,7 +104,7 @@ export default function RichTextEditor({ value, onChange, placeholder, disabled 
       let content = value || '';
       
       // Manter &nbsp; como está para o editor processar corretamente
-      editor.commands.setContent(content, false);
+      editor.commands.setContent(content, { emitUpdate: false });
       
       console.log('HTML após setContent:', editor.getHTML());
     }

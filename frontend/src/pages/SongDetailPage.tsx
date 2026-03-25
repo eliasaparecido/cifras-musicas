@@ -1,7 +1,8 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { ArrowLeft, Edit, Trash2, Music } from "lucide-react";
 import { songService } from "../services/songService";
+import { authService } from "../services/authService";
 import { Song } from "../types";
 import { transposeLyrics, renderLyricsAsHtml, stripHtml } from "../utils/transposeUtils";
 
@@ -10,7 +11,7 @@ const MINOR_KEYS = KEYS.map((k) => k + "m");
 const ALL_KEYS = [...KEYS, ...MINOR_KEYS];
 
 // Componente para renderizar letras (força re-render)
-function LyricsDisplay({ html, key: displayKey }: { html: string; key: string }) {
+function LyricsDisplay({ html }: { html: string }) {
   return (
     <div 
       className="lyrics-display"
@@ -28,12 +29,19 @@ export default function SongDetailPage() {
   const [showTransposeModal, setShowTransposeModal] = useState(false);
   const [transposeKey, setTransposeKey] = useState("");
   const [displayLyrics, setDisplayLyrics] = useState("");
+  const [isAuthenticated, setIsAuthenticated] = useState(authService.isAuthenticated());
 
   useEffect(() => {
     if (id) {
       loadSong(id);
     }
   }, [id]);
+
+  useEffect(() => {
+    const syncAuth = () => setIsAuthenticated(authService.isAuthenticated());
+    window.addEventListener("auth-changed", syncAuth);
+    return () => window.removeEventListener("auth-changed", syncAuth);
+  }, []);
 
   const loadSong = async (songId: string, key?: string) => {
     try {
@@ -137,30 +145,36 @@ export default function SongDetailPage() {
         </div>
 
         <div className="flex flex-wrap gap-2">
-          <Link
-            to={`/songs/${id}/edit`}
-            className="btn-secondary flex items-center space-x-2 justify-center flex-1 sm:flex-initial"
-          >
-            <Edit size={20} />
-            <span>Editar</span>
-          </Link>
-          <button
-            onClick={() => {
-              setTransposeKey(song.originalKey);
-              setShowTransposeModal(true);
-            }}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center space-x-2 justify-center flex-1 sm:flex-initial"
-          >
-            <Music size={20} />
-            <span>Transpor Tom</span>
-          </button>
-          <button
-            onClick={handleDelete}
-            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors flex items-center space-x-2 justify-center flex-1 sm:flex-initial"
-          >
-            <Trash2 size={20} />
-            <span>Excluir</span>
-          </button>
+          {isAuthenticated ? (
+            <>
+              <Link
+                to={`/songs/${id}/edit`}
+                className="btn-secondary flex items-center space-x-2 justify-center flex-1 sm:flex-initial"
+              >
+                <Edit size={20} />
+                <span>Editar</span>
+              </Link>
+              <button
+                onClick={() => {
+                  setTransposeKey(song.originalKey);
+                  setShowTransposeModal(true);
+                }}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center space-x-2 justify-center flex-1 sm:flex-initial"
+              >
+                <Music size={20} />
+                <span>Transpor Tom</span>
+              </button>
+              <button
+                onClick={handleDelete}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors flex items-center space-x-2 justify-center flex-1 sm:flex-initial"
+              >
+                <Trash2 size={20} />
+                <span>Excluir</span>
+              </button>
+            </>
+          ) : (
+            <Link to="/login" className="btn-primary">Entrar para editar</Link>
+          )}
         </div>
       </div>
 

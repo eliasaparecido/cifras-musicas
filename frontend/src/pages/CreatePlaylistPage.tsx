@@ -10,6 +10,7 @@ export default function CreatePlaylistPage() {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
+    isPublic: false,
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -29,6 +30,7 @@ export default function CreatePlaylistPage() {
       setFormData({
         name: playlist.name,
         description: playlist.description || '',
+        isPublic: playlist.isPublic,
       });
     } catch (err) {
       setError('Erro ao carregar playlist');
@@ -54,12 +56,14 @@ export default function CreatePlaylistPage() {
         await playlistService.update(id, {
           name: formData.name,
           description: formData.description || undefined,
+          isPublic: formData.isPublic,
         });
         navigate(`/playlists/${id}`);
       } else {
         const playlist = await playlistService.create({
           name: formData.name,
           description: formData.description || undefined,
+          isPublic: formData.isPublic,
         });
         navigate(`/playlists/${playlist.id}`);
       }
@@ -114,6 +118,20 @@ export default function CreatePlaylistPage() {
               rows={4}
               disabled={loading}
             />
+          </div>
+
+          <div className="mb-6 flex items-center gap-2">
+            <input
+              id="playlist-is-public"
+              type="checkbox"
+              checked={formData.isPublic}
+              onChange={(e) => setFormData({ ...formData, isPublic: e.target.checked })}
+              className="h-4 w-4"
+              disabled={loading}
+            />
+            <label className="text-gray-700 text-sm font-bold" htmlFor="playlist-is-public">
+              Playlist pública (visível para todos)
+            </label>
           </div>
 
           <div className="flex items-center justify-between">

@@ -9,6 +9,7 @@ import {
   Copy,
 } from "lucide-react";
 import { playlistService } from "../services/playlistService";
+import { authService, AuthUser } from "../services/authService";
 import { Playlist } from "../types";
 import PlaylistPreviewModal from "../components/PlaylistPreviewModal";
 import DuplicatePlaylistModal from "../components/DuplicatePlaylistModal";
@@ -21,6 +22,8 @@ export default function PlaylistsPage() {
   const [search, setSearch] = useState("");
   const [hasMore, setHasMore] = useState(true);
   const [skip, setSkip] = useState(0);
+  const [isAuthenticated, setIsAuthenticated] = useState(authService.isAuthenticated());
+  const [currentUser, setCurrentUser] = useState<AuthUser | null>(authService.getCurrentUser());
   const observerTarget = useRef<HTMLDivElement>(null);
   const [previewPlaylist, setPreviewPlaylist] = useState<Playlist | null>(null);
   const [duplicatePlaylist, setDuplicatePlaylist] = useState<Playlist | null>(
@@ -34,6 +37,22 @@ export default function PlaylistsPage() {
   useEffect(() => {
     loadPlaylists(true);
   }, []);
+
+  useEffect(() => {
+    const syncAuth = () => {
+      setIsAuthenticated(authService.isAuthenticated());
+      setCurrentUser(authService.getCurrentUser());
+    };
+    window.addEventListener('auth-changed', syncAuth);
+    return () => window.removeEventListener('auth-changed', syncAuth);
+  }, []);
+
+  const canManagePlaylist = (playlist: Playlist) => {
+    if (!isAuthenticated || !currentUser) return false;
+    if (currentUser.isAdmin) return true;
+    if (playlist.isPublic) return true;
+    return playlist.ownerId === currentUser.id;
+  };
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -152,13 +171,17 @@ export default function PlaylistsPage() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold text-gray-900">Playlists</h1>
-        <Link
-          to="/playlists/new"
-          className="btn-primary flex items-center space-x-2"
-        >
-          <Plus size={20} />
-          <span>Nova Playlist</span>
-        </Link>
+        {isAuthenticated ? (
+          <Link
+            to="/playlists/new"
+            className="btn-primary flex items-center space-x-2"
+          >
+            <Plus size={20} />
+            <span>Nova Playlist</span>
+          </Link>
+        ) : (
+          <Link to="/login" className="btn-primary">Entrar para criar</Link>
+        )}
       </div>
 
       {/* Search Bar */}
@@ -189,13 +212,19 @@ export default function PlaylistsPage() {
         <div className="text-center py-12">
           <ListIcon size={64} className="mx-auto text-gray-300 mb-4" />
           <p className="text-gray-600 mb-4">Nenhuma playlist criada ainda</p>
-          <Link
-            to="/playlists/new"
-            className="btn-primary inline-flex items-center space-x-2"
-          >
-            <Plus size={20} />
-            <span>Criar Primeira Playlist</span>
-          </Link>
+          {isAuthenticated ? (
+            <Link
+              to="/playlists/new"
+              className="btn-primary inline-flex items-center space-x-2"
+            >
+              <Plus size={20} />
+              <span>Criar Primeira Playlist</span>
+            </Link>
+          ) : (
+            <Link to="/login" className="btn-primary inline-flex items-center space-x-2">
+              <span>Entrar para criar</span>
+            </Link>
+          )}
         </div>
       ) : (
         <div className="grid gap-4">
@@ -232,14 +261,16 @@ export default function PlaylistsPage() {
                     <span className="hidden sm:inline">Visualizar</span>
                     <span className="sm:hidden">Ver</span>
                   </button>
-                  <button
-                    onClick={() => setDuplicatePlaylist(playlist)}
-                    className="px-3 py-2 text-xs sm:text-sm bg-purple-100 text-purple-700 hover:bg-purple-200 rounded-lg transition-colors flex items-center space-x-1 sm:space-x-2"
-                  >
-                    <Copy size={16} className="flex-shrink-0" />
-                    <span className="hidden sm:inline">Duplicar</span>
-                    <span className="sm:hidden">Dup</span>
-                  </button>
+                  {canManagePlaylist(playlist) && (
+                    <button
+                      onClick={() => setDuplicatePlaylist(playlist)}
+                      className="px-3 py-2 text-xs sm:text-sm bg-purple-100 text-purple-700 hover:bg-purple-200 rounded-lg transition-colors flex items-center space-x-1 sm:space-x-2"
+                    >
+                      <Copy size={16} className="flex-shrink-0" />
+                      <span className="hidden sm:inline">Duplicar</span>
+                      <span className="sm:hidden">Dup</span>
+                    </button>
+                  )}
                   <button
                     onClick={() => setPdfOptionsPlaylist(playlist)}
                     disabled={
@@ -253,18 +284,22 @@ export default function PlaylistsPage() {
                       {generatingPDF === playlist.id ? "Gerando..." : "PDF"}
                     </span>
                   </button>
-                  <Link
-                    to={`/playlists/${playlist.id}/edit`}
-                    className="px-3 py-2 text-xs sm:text-sm bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors inline-flex items-center"
-                  >
-                    Editar
-                  </Link>
-                  <button
-                    onClick={() => handleDelete(playlist.id)}
-                    className="px-3 py-2 text-xs sm:text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-lg transition-colors"
-                  >
-                    Excluir
-                  </button>
+                  {canManagePlaylist(playlist) && (
+                    <>
+                      <Link
+                        to={`/playlists/${playlist.id}/edit`}
+                        className="px-3 py-2 text-xs sm:text-sm bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors inline-flex items-center"
+                      >
+                        Editar
+                      </Link>
+                      <button
+                        onClick={() => handleDelete(playlist.id)}
+                        className="px-3 py-2 text-xs sm:text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-lg transition-colors"
+                      >
+                        Excluir
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             </div>

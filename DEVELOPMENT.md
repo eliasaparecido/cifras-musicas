@@ -150,12 +150,12 @@ model NovoModel {
 
 2. Criar migration:
 ```bash
-docker-compose exec backend npx prisma migrate dev --name adiciona_novo_model
+docker compose exec backend npx prisma migrate dev --name adiciona_novo_model
 ```
 
 3. Gerar client:
 ```bash
-docker-compose exec backend npx prisma generate
+docker compose exec backend npx prisma generate
 ```
 
 ### Usar Prisma Client
@@ -267,7 +267,7 @@ describe('transposeChord', () => {
 
 Ver logs em tempo real:
 ```bash
-docker-compose logs -f backend
+docker compose logs -f backend
 ```
 
 ### Frontend
@@ -282,7 +282,7 @@ Usar Prisma Studio:
 ```bash
 make studio
 # ou
-docker-compose exec backend npx prisma studio
+docker compose exec backend npx prisma studio
 ```
 
 Acesse: http://localhost:5555
@@ -297,7 +297,7 @@ Acesse: http://localhost:5555
    - Instalar Docker e Docker Compose
    - Clonar repositório
    - Configurar variáveis de ambiente
-   - `docker-compose up -d`
+   - `docker compose up -d`
 
 2. **Heroku**:
    - Heroku não suporta SQLite em produção

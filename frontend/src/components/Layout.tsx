@@ -1,6 +1,7 @@
-import { ReactNode, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Music, List, Home, Menu, X } from 'lucide-react';
+import { ReactNode, useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Music, List, Home, Menu, X, LogIn, LogOut, User } from 'lucide-react';
+import { authService } from '../services/authService';
 
 interface LayoutProps {
   children: ReactNode;
@@ -8,10 +9,28 @@ interface LayoutProps {
 
 export default function Layout({ children }: LayoutProps) {
   const location = useLocation();
+  const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(authService.isAuthenticated());
+  const [userName, setUserName] = useState(authService.getCurrentUser()?.name || '');
+
+  useEffect(() => {
+    const syncAuth = () => {
+      setIsAuthenticated(authService.isAuthenticated());
+      setUserName(authService.getCurrentUser()?.name || '');
+    };
+
+    window.addEventListener('auth-changed', syncAuth);
+    return () => window.removeEventListener('auth-changed', syncAuth);
+  }, []);
 
   const isActive = (path: string) => {
     return location.pathname === path || location.pathname.startsWith(path + '/');
+  };
+
+  const handleLogout = async () => {
+    await authService.logout();
+    navigate('/');
   };
 
   return (
@@ -62,6 +81,36 @@ export default function Layout({ children }: LayoutProps) {
               </Link>
             </nav>
 
+            <div className="hidden md:flex items-center gap-2">
+              {isAuthenticated ? (
+                <>
+                  <div className="flex items-center gap-1 px-3 py-2 bg-primary-600 rounded-lg text-sm">
+                    <User size={16} />
+                    <span>{userName || 'Usuario'}</span>
+                  </div>
+                  <Link
+                    to="/change-password"
+                    className="flex items-center gap-1 px-3 py-2 rounded-lg hover:bg-primary-600"
+                  >
+                    <User size={16} />
+                    <span>Senha</span>
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center gap-1 px-3 py-2 rounded-lg hover:bg-primary-600"
+                  >
+                    <LogOut size={16} />
+                    <span>Sair</span>
+                  </button>
+                </>
+              ) : (
+                <Link to="/login" className="flex items-center gap-1 px-3 py-2 rounded-lg hover:bg-primary-600">
+                  <LogIn size={16} />
+                  <span>Entrar</span>
+                </Link>
+              )}
+            </div>
+
             {/* Mobile Menu Button */}
             <button
               className="md:hidden p-2 hover:bg-primary-600 rounded-lg transition-colors"
@@ -111,6 +160,38 @@ export default function Layout({ children }: LayoutProps) {
                 <List size={20} />
                 <span>Playlists</span>
               </Link>
+
+              {isAuthenticated ? (
+                <>
+                  <Link
+                    to="/change-password"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center space-x-2 px-4 py-3 rounded-lg hover:bg-primary-600"
+                  >
+                    <User size={20} />
+                    <span>Alterar senha</span>
+                  </Link>
+                  <button
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      handleLogout();
+                    }}
+                    className="w-full text-left flex items-center space-x-2 px-4 py-3 rounded-lg hover:bg-primary-600"
+                  >
+                    <LogOut size={20} />
+                    <span>Sair ({userName || 'Usuario'})</span>
+                  </button>
+                </>
+              ) : (
+                <Link
+                  to="/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center space-x-2 px-4 py-3 rounded-lg hover:bg-primary-600"
+                >
+                  <LogIn size={20} />
+                  <span>Entrar</span>
+                </Link>
+              )}
             </nav>
           )}
         </div>

@@ -167,7 +167,7 @@ Execute o seed para popular automaticamente:
 ```bash
 make seed
 # ou
-docker-compose exec backend npm run seed
+docker compose exec backend npm run seed
 ```
 
 ---

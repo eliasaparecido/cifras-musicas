@@ -34,7 +34,7 @@
 - Vite 5 (frontend dev/build) - `frontend/vite.config.ts`
 - TypeScript compiler (`tsc`) for backend and frontend build steps - `backend/package.json`, `frontend/package.json`
 - TSX (backend dev runner and seed/migration scripts) - `backend/package.json`
-- Docker Compose (local multi-service runtime) - `docker-compose.yml`
+- Docker Compose (local multi-service runtime) - `docker compose.yml`
 
 ## Key Dependencies
 
@@ -54,8 +54,8 @@
 ## Configuration
 
 **Environment:**
-- Backend uses `PORT` and `DATABASE_URL` (SQLite file URL) - `docker-compose.yml`, `backend/prisma/schema.prisma`
-- Frontend uses `VITE_API_URL` - `frontend/src/lib/api.ts`, `docker-compose.yml`
+- Backend uses `PORT` and `DATABASE_URL` (SQLite file URL) - `docker compose.yml`, `backend/prisma/schema.prisma`
+- Frontend uses `VITE_API_URL` - `frontend/src/lib/api.ts`, `docker compose.yml`
 
 **Build:**
 - Backend TypeScript config: `backend/tsconfig.json`
@@ -70,7 +70,7 @@
 - Docker and Docker Compose for containerized local workflow (`make up`, `make migrate`)
 
 **Production:**
-- Container deployment model implied by `backend/Dockerfile`, `frontend/Dockerfile`, and `docker-compose.yml`
+- Container deployment model implied by `backend/Dockerfile`, `frontend/Dockerfile`, and `docker compose.yml`
 
 ---
 

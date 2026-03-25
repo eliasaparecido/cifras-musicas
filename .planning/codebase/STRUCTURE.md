@@ -7,7 +7,7 @@
 - `backend/` - Express API, Prisma schema/migrations, utilities
 - `frontend/` - React application (Vite + TypeScript + Tailwind)
 - `shared/` - Workspace package placeholder (currently no mapped source usage)
-- `docker-compose.yml` - local service orchestration
+- `docker compose.yml` - local service orchestration
 - `Makefile` - frequent developer commands
 - `README.md`, `QUICKSTART.md`, `DEVELOPMENT.md` - operational and feature docs
 

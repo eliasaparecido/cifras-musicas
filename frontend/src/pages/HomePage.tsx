@@ -1,7 +1,17 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Music, List, Plus } from 'lucide-react';
+import { authService } from '../services/authService';
 
 export default function HomePage() {
+  const [isAuthenticated, setIsAuthenticated] = useState(authService.isAuthenticated());
+
+  useEffect(() => {
+    const syncAuth = () => setIsAuthenticated(authService.isAuthenticated());
+    window.addEventListener('auth-changed', syncAuth);
+    return () => window.removeEventListener('auth-changed', syncAuth);
+  }, []);
+
   return (
     <div className="space-y-8">
       <div className="text-center">
@@ -27,10 +37,16 @@ export default function HomePage() {
             Cadastre e gerencie suas cifras musicais. Transponha para qualquer tom instantaneamente.
           </p>
           <div className="flex flex-col sm:flex-row gap-3">
-            <Link to="/songs/new" className="btn-primary flex items-center justify-center space-x-2">
-              <Plus size={20} />
-              <span>Nova Música</span>
-            </Link>
+            {isAuthenticated ? (
+              <Link to="/songs/new" className="btn-primary flex items-center justify-center space-x-2">
+                <Plus size={20} />
+                <span>Nova Música</span>
+              </Link>
+            ) : (
+              <Link to="/login" className="btn-primary text-center">
+                Entrar para cadastrar
+              </Link>
+            )}
             <Link to="/songs" className="btn-secondary text-center">
               Ver Todas
             </Link>
@@ -49,10 +65,16 @@ export default function HomePage() {
             Organize suas músicas em playlists temáticas e gere PDFs prontos para impressão.
           </p>
           <div className="flex flex-col sm:flex-row gap-3">
-            <Link to="/playlists/new" className="btn-primary flex items-center justify-center space-x-2">
-              <Plus size={20} />
-              <span>Nova Playlist</span>
-            </Link>
+            {isAuthenticated ? (
+              <Link to="/playlists/new" className="btn-primary flex items-center justify-center space-x-2">
+                <Plus size={20} />
+                <span>Nova Playlist</span>
+              </Link>
+            ) : (
+              <Link to="/login" className="btn-primary text-center">
+                Entrar para criar
+              </Link>
+            )}
             <Link to="/playlists" className="btn-secondary text-center">
               Ver Todas
             </Link>

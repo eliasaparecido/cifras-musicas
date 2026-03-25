@@ -110,7 +110,7 @@ Bem-vindo ao sistema de Cifras Musicais! Esta é a documentação completa do pr
 
 ## 🗂️ Arquivos de Configuração
 
-### docker-compose.yml
+### docker compose.yml
 Orquestração dos containers Docker (backend + frontend)
 
 ### Makefile

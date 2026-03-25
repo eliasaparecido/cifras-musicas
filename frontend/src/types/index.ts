@@ -4,6 +4,8 @@ export interface Song {
   artist: string;
   originalKey: string;
   lyrics: string;
+  isPublic: boolean;
+  ownerId?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -12,6 +14,8 @@ export interface Playlist {
   id: string;
   name: string;
   description?: string;
+  isPublic: boolean;
+  ownerId?: string | null;
   createdAt: string;
   updatedAt: string;
   songs: PlaylistSong[];
@@ -31,11 +35,13 @@ export interface CreateSongDto {
   artist: string;
   originalKey: string;
   lyrics: string;
+  isPublic?: boolean;
 }
 
 export interface CreatePlaylistDto {
   name: string;
   description?: string;
+  isPublic?: boolean;
 }
 
 export interface AddSongToPlaylistDto {

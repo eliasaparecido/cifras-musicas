@@ -62,7 +62,7 @@
 - API health check: `GET /health`.
 - Frontend dev server: Vite on `5173` (`frontend/vite.config.ts`).
 - Backend dev server: TSX watch on `3002` (`backend/package.json`, `backend/src/server.ts`).
-- Containerized local orchestration: `docker-compose.yml`.
+- Containerized local orchestration: `docker compose.yml`.
 
 ## Architecture Guidance for Future Phases
 

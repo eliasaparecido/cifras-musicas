@@ -20,6 +20,7 @@ export default function CreateSongPage() {
     artist: '',
     originalKey: 'C',
     lyrics: '',
+    isPublic: true,
   });
 
   useEffect(() => {
@@ -37,6 +38,7 @@ export default function CreateSongPage() {
         artist: song.artist,
         originalKey: song.originalKey,
         lyrics: song.lyrics,
+        isPublic: song.isPublic,
       });
     } catch (error) {
       console.error('Erro ao carregar música:', error);
@@ -165,6 +167,19 @@ export default function CreateSongPage() {
               </option>
             ))}
           </select>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <input
+            id="song-is-public"
+            type="checkbox"
+            checked={Boolean(formData.isPublic)}
+            onChange={(e) => setFormData({ ...formData, isPublic: e.target.checked })}
+            className="h-4 w-4"
+          />
+          <label htmlFor="song-is-public" className="text-sm text-gray-700">
+            Música pública (visível para todos)
+          </label>
         </div>
 
         <div>

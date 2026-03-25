@@ -18,7 +18,7 @@ if ! command -v docker &> /dev/null; then
 fi
 
 # Verificar se Docker Compose está instalado
-if ! command -v docker-compose &> /dev/null; then
+if ! command -v docker compose &> /dev/null; then
     echo "❌ Docker Compose não está instalado!"
     echo "   Instale o Docker Compose: https://docs.docker.com/compose/install/"
     exit 1
@@ -30,17 +30,17 @@ echo ""
 
 # Parar containers existentes
 echo "🛑 Parando containers existentes..."
-docker-compose down 2>/dev/null || true
+docker compose down 2>/dev/null || true
 
 # Construir imagens
 echo ""
 echo "🔨 Construindo imagens Docker..."
-docker-compose build
+docker compose build
 
 # Iniciar containers
 echo ""
 echo "🚀 Iniciando containers..."
-docker-compose up -d
+docker compose up -d
 
 # Aguardar backend iniciar
 echo ""
@@ -50,19 +50,19 @@ sleep 10
 # Executar migrations
 echo ""
 echo "💾 Executando migrations do banco de dados..."
-docker-compose exec -T backend npx prisma migrate dev --name init
+docker compose exec -T backend npx prisma migrate dev --name init
 
 # Gerar Prisma Client
 echo ""
 echo "🔧 Gerando Prisma Client..."
-docker-compose exec -T backend npx prisma generate
+docker compose exec -T backend npx prisma generate
 
 # Popular banco com dados de exemplo (opcional)
 read -p "Deseja popular o banco com dados de exemplo? (s/N) " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Ss]$ ]]; then
     echo "🌱 Populando banco com dados de exemplo..."
-    docker-compose exec -T backend npm run seed
+    docker compose exec -T backend npm run seed
 fi
 
 echo ""

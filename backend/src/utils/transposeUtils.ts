@@ -332,13 +332,27 @@ function transposeChordWithHtml(
  */
 function isChord(word: string): boolean {
   const trimmed = word.trim();
-  return /^[A-G][#b]?(?:m|maj|min|dim|aug|sus|add)?[0-9]*(?:\/[A-G][#b]?)?$/i.test(trimmed);
+  if (!trimmed) {
+    return false;
+  }
+
+  const chordRegex = /^[A-G][#b]?(?:m|maj|min|dim|aug|sus|add)?[0-9]*(?:\/[A-G][#b]?)?$/;
+  return chordRegex.test(trimmed);
 }
 
 /**
  * Transpõe toda a letra da música (texto puro)
  * Identifica e transpõe acordes automaticamente
  */
+function isChordLine(line: string): boolean {
+  const words = line.trim().split(/\s+/).filter(Boolean);
+  if (words.length === 0) {
+    return false;
+  }
+
+  return words.every((word) => isChord(word));
+}
+
 export function transposeLyrics(
   lyrics: string,
   fromKey: string,
@@ -356,27 +370,28 @@ export function transposeLyrics(
 
   for (const line of lines) {
     const trimmed = line.trim();
-    
-    // Se a linha está vazia, mantém
+
     if (!trimmed) {
       result.push(line);
       continue;
     }
-    
-    // Divide a linha em palavras mantendo os espaços
+
+    if (!isChordLine(line)) {
+      result.push(line);
+      continue;
+    }
+
     const words = line.split(/(\s+)/);
-    let transposedLine = '';
-    
+    let transposedLine = "";
+
     for (const word of words) {
       if (isChord(word)) {
-        // É um acorde, transpõe
         transposedLine += transposeChord(word.trim(), semitones, preferFlat);
       } else {
-        // Não é acorde, mantém como está
         transposedLine += word;
       }
     }
-    
+
     result.push(transposedLine);
   }
 

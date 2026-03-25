@@ -26,10 +26,31 @@ print_warning() {
     echo -e "${YELLOW}⚠${NC} $1"
 }
 
+# Backup do SQLite (se existir)
+backup_sqlite() {
+    local db_path="backend/prisma/dev.db"
+    local backup_dir="backups"
+
+    if [ -f "$db_path" ]; then
+        mkdir -p "$backup_dir"
+        local timestamp
+        timestamp=$(date +"%Y%m%d-%H%M%S")
+        local backup_file="$backup_dir/dev.db.$timestamp.bak"
+        cp "$db_path" "$backup_file"
+        print_status "Backup do banco criado em: $backup_file"
+    else
+        print_warning "Banco SQLite não encontrado em $db_path (backup ignorado)."
+    fi
+}
+
+echo ""
+print_status "Criando backup do banco antes do deploy..."
+backup_sqlite
+
 # 1. Parar containers
 echo ""
 print_status "Parando containers..."
-docker-compose down -v
+docker compose down
 
 # 2. Limpar volumes antigos (opcional, comentado por segurança)
 # print_warning "Limpando volumes antigos..."
@@ -38,7 +59,7 @@ docker-compose down -v
 # 3. Rebuild das imagens
 echo ""
 print_status "Rebuilding imagens Docker (isso pode levar alguns minutos)..."
-docker-compose build --no-cache
+docker compose build --no-cache
 
 # 4. Verificar se o build foi bem-sucedido
 if [ $? -eq 0 ]; then
@@ -51,7 +72,7 @@ fi
 # 5. Subir containers
 echo ""
 print_status "Iniciando containers..."
-docker-compose up -d
+docker compose up -d
 
 # 6. Aguardar containers iniciarem
 echo ""
@@ -61,17 +82,17 @@ sleep 10
 # 7. Verificar status
 echo ""
 print_status "Verificando status dos containers..."
-docker-compose ps
+docker compose ps
 
 # 8. Verificar dependências do frontend
 echo ""
 print_status "Verificando dependências do Tiptap..."
-if docker-compose exec -T frontend sh -c "ls node_modules/@tiptap/react > /dev/null 2>&1"; then
+if docker compose exec -T frontend sh -c "ls node_modules/@tiptap/react > /dev/null 2>&1"; then
     print_status "Dependências do Tiptap instaladas corretamente!"
 else
     print_warning "Dependências do Tiptap não encontradas. Instalando..."
-    docker-compose exec -T frontend npm install
-    docker-compose restart frontend
+    docker compose exec -T frontend npm install
+    docker compose restart frontend
     sleep 5
 fi
 
@@ -103,11 +124,11 @@ echo "📱 Frontend: http://localhost:5173"
 echo "🔧 Backend:  http://localhost:3002"
 echo ""
 echo "Para ver os logs:"
-echo "  docker-compose logs -f"
+echo "  docker compose logs -f"
 echo ""
 echo "Para ver logs específicos:"
-echo "  docker-compose logs -f frontend"
-echo "  docker-compose logs -f backend"
+echo "  docker compose logs -f frontend"
+echo "  docker compose logs -f backend"
 echo ""
 print_warning "Aguarde alguns segundos para os serviços inicializarem completamente."
 echo ""

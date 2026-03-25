@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Search, Music } from 'lucide-react';
 import { songService } from '../services/songService';
+import { authService } from '../services/authService';
 import { Song } from '../types';
 
 export default function SongsPage() {
@@ -11,8 +12,15 @@ export default function SongsPage() {
   const [search, setSearch] = useState('');
   const [hasMore, setHasMore] = useState(true);
   const [skip, setSkip] = useState(0);
+  const [isAuthenticated, setIsAuthenticated] = useState(authService.isAuthenticated());
   const observerTarget = useRef<HTMLDivElement>(null);
   const ITEMS_PER_PAGE = 20;
+
+  useEffect(() => {
+    const syncAuth = () => setIsAuthenticated(authService.isAuthenticated());
+    window.addEventListener('auth-changed', syncAuth);
+    return () => window.removeEventListener('auth-changed', syncAuth);
+  }, []);
 
   useEffect(() => {
     loadSongs(true);
@@ -97,10 +105,14 @@ export default function SongsPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Músicas</h1>
-        <Link to="/songs/new" className="btn-primary flex items-center justify-center space-x-2">
-          <Plus size={20} />
-          <span>Nova Música</span>
-        </Link>
+        {isAuthenticated ? (
+          <Link to="/songs/new" className="btn-primary flex items-center justify-center space-x-2">
+            <Plus size={20} />
+            <span>Nova Música</span>
+          </Link>
+        ) : (
+          <Link to="/login" className="btn-primary text-center">Entrar para cadastrar</Link>
+        )}
       </div>
 
       {/* Search */}
@@ -129,10 +141,16 @@ export default function SongsPage() {
         <div className="text-center py-12">
           <Music size={64} className="mx-auto text-gray-300 mb-4" />
           <p className="text-gray-600 mb-4">Nenhuma música cadastrada ainda</p>
-          <Link to="/songs/new" className="btn-primary inline-flex items-center space-x-2">
-            <Plus size={20} />
-            <span>Cadastrar Primeira Música</span>
-          </Link>
+          {isAuthenticated ? (
+            <Link to="/songs/new" className="btn-primary inline-flex items-center space-x-2">
+              <Plus size={20} />
+              <span>Cadastrar Primeira Música</span>
+            </Link>
+          ) : (
+            <Link to="/login" className="btn-primary inline-flex items-center space-x-2">
+              <span>Entrar para cadastrar</span>
+            </Link>
+          )}
         </div>
       ) : (
         <div className="grid gap-4">
@@ -152,18 +170,24 @@ export default function SongsPage() {
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  <Link
-                    to={`/songs/${song.id}/edit`}
-                    className="px-3 sm:px-4 py-2 text-sm bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors flex-1 sm:flex-initial text-center"
-                  >
-                    Editar
-                  </Link>
-                  <button
-                    onClick={() => handleDelete(song.id)}
-                    className="px-3 sm:px-4 py-2 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-lg transition-colors flex-1 sm:flex-initial"
-                  >
-                    Excluir
-                  </button>
+                  {isAuthenticated ? (
+                    <>
+                      <Link
+                        to={`/songs/${song.id}/edit`}
+                        className="px-3 sm:px-4 py-2 text-sm bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors flex-1 sm:flex-initial text-center"
+                      >
+                        Editar
+                      </Link>
+                      <button
+                        onClick={() => handleDelete(song.id)}
+                        className="px-3 sm:px-4 py-2 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-lg transition-colors flex-1 sm:flex-initial"
+                      >
+                        Excluir
+                      </button>
+                    </>
+                  ) : (
+                    <span className="text-xs text-gray-500">Somente leitura</span>
+                  )}
                 </div>
               </div>
             </div>

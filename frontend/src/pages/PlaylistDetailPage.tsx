@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { playlistService } from "../services/playlistService";
 import { songService } from "../services/songService";
+import { authService, AuthUser } from "../services/authService";
 import { Playlist, Song } from "../types";
 import PlaylistPreviewModal from "../components/PlaylistPreviewModal";
 
@@ -25,10 +26,21 @@ export default function PlaylistDetailPage() {
   const [editingKey, setEditingKey] = useState<string | null>(null);
   const [tempKey, setTempKey] = useState("");
   const [showPdfOptions, setShowPdfOptions] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(authService.isAuthenticated());
+  const [currentUser, setCurrentUser] = useState<AuthUser | null>(authService.getCurrentUser());
 
   useEffect(() => {
     loadData();
   }, [id]);
+
+  useEffect(() => {
+    const syncAuth = () => {
+      setIsAuthenticated(authService.isAuthenticated());
+      setCurrentUser(authService.getCurrentUser());
+    };
+    window.addEventListener("auth-changed", syncAuth);
+    return () => window.removeEventListener("auth-changed", syncAuth);
+  }, []);
 
   const loadData = async () => {
     if (!id) return;
@@ -183,6 +195,13 @@ export default function PlaylistDetailPage() {
     );
   }
 
+  const canManagePlaylist = (() => {
+    if (!isAuthenticated || !currentUser) return false;
+    if (currentUser.isAdmin) return true;
+    if (playlist.isPublic) return true;
+    return playlist.ownerId === currentUser.id;
+  })();
+
   const songsInPlaylist = playlist.songs.map((ps) => ps.songId);
   const availableToAdd = availableSongs.filter(
     (s) => !songsInPlaylist.includes(s.id)
@@ -224,12 +243,14 @@ export default function PlaylistDetailPage() {
             >
               {generatingPDF ? "Gerando..." : "📄 Baixar PDF"}
             </button>
-            <button
-              onClick={handleDeletePlaylist}
-              className="px-3 sm:px-4 py-2 text-sm bg-red-500 hover:bg-red-700 text-white font-bold rounded flex-1 sm:flex-initial"
-            >
-              Excluir
-            </button>
+            {canManagePlaylist && (
+              <button
+                onClick={handleDeletePlaylist}
+                className="px-3 sm:px-4 py-2 text-sm bg-red-500 hover:bg-red-700 text-white font-bold rounded flex-1 sm:flex-initial"
+              >
+                Excluir
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -239,12 +260,16 @@ export default function PlaylistDetailPage() {
           <h2 className="text-xl font-bold">
             Músicas ({playlist.songs.length})
           </h2>
-          <button
-            onClick={() => setShowAddSong(!showAddSong)}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          >
-            {showAddSong ? "Cancelar" : "+ Adicionar Música"}
-          </button>
+          {canManagePlaylist ? (
+            <button
+              onClick={() => setShowAddSong(!showAddSong)}
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            >
+              {showAddSong ? "Cancelar" : "+ Adicionar Música"}
+            </button>
+          ) : (
+            <span className="text-sm text-gray-500">Somente leitura</span>
+          )}
         </div>
 
         {showAddSong && (
@@ -345,17 +370,17 @@ export default function PlaylistDetailPage() {
               .map((playlistSong, index) => (
                 <div
                   key={playlistSong.id}
-                  draggable
-                  onDragStart={() => handleDragStart(index)}
-                  onDragOver={handleDragOver}
-                  onDrop={() => handleDrop(index)}
-                  onDragEnd={handleDragEnd}
-                  className={`flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 bg-gray-50 rounded hover:bg-gray-100 cursor-move transition-all gap-3 ${
+                  draggable={canManagePlaylist}
+                  onDragStart={() => canManagePlaylist && handleDragStart(index)}
+                  onDragOver={(e) => canManagePlaylist && handleDragOver(e)}
+                  onDrop={() => canManagePlaylist && handleDrop(index)}
+                  onDragEnd={() => canManagePlaylist && handleDragEnd()}
+                  className={`flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 bg-gray-50 rounded hover:bg-gray-100 ${canManagePlaylist ? "cursor-move" : "cursor-default"} transition-all gap-3 ${
                     draggedIndex === index ? "opacity-50 scale-95" : ""
                   }`}
                 >
                   <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
-                    <span className="text-gray-400 hover:text-gray-600 cursor-grab active:cursor-grabbing flex-shrink-0">
+                    <span className={`text-gray-400 flex-shrink-0 ${canManagePlaylist ? "hover:text-gray-600 cursor-grab active:cursor-grabbing" : ""}`}>
                       ⋮⋮
                     </span>
                     <span className="text-gray-500 font-bold flex-shrink-0">
@@ -374,7 +399,7 @@ export default function PlaylistDetailPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2 sm:gap-4 justify-end">
-                    {editingKey === playlistSong.id ? (
+                    {canManagePlaylist && editingKey === playlistSong.id ? (
                       <div className="flex items-center gap-2">
                         <select
                           value={tempKey}
@@ -408,7 +433,7 @@ export default function PlaylistDetailPage() {
                           ✕
                         </button>
                       </div>
-                    ) : (
+                    ) : canManagePlaylist ? (
                       <button
                         onClick={() => {
                           setEditingKey(playlistSong.id);
@@ -419,13 +444,19 @@ export default function PlaylistDetailPage() {
                       >
                         Tom: {playlistSong.key} ✏️
                       </button>
+                    ) : (
+                      <span className="text-sm bg-gray-100 text-gray-700 px-3 py-1 rounded">
+                        Tom: {playlistSong.key}
+                      </span>
                     )}
-                    <button
-                      onClick={() => handleRemoveSong(playlistSong.songId)}
-                      className="text-red-500 hover:text-red-700 font-bold"
-                    >
-                      ✕
-                    </button>
+                    {canManagePlaylist && (
+                      <button
+                        onClick={() => handleRemoveSong(playlistSong.songId)}
+                        className="text-red-500 hover:text-red-700 font-bold"
+                      >
+                        ✕
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}

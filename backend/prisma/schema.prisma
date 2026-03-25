@@ -13,11 +13,13 @@ model Song {
   artist      String
   originalKey String   // Tom original (ex: "C", "Am", "G#")
   lyrics      String   // Letra com cifras
+  isPublic    Boolean  @default(true)
+  ownerId     String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  
+
   playlistSongs PlaylistSong[]
-  
+
   @@index([title])
   @@index([artist])
 }
@@ -26,11 +28,13 @@ model Playlist {
   id          String   @id @default(uuid())
   name        String
   description String?
+  isPublic    Boolean  @default(false)
+  ownerId     String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  
+
   songs PlaylistSong[]
-  
+
   @@index([name])
 }
 
@@ -40,11 +44,24 @@ model PlaylistSong {
   songId     String
   order      Int      // Ordem da música na playlist
   key        String   // Tom específico para esta playlist (pode ser diferente do original)
-  
+
   playlist Playlist @relation(fields: [playlistId], references: [id], onDelete: Cascade)
   song     Song     @relation(fields: [songId], references: [id], onDelete: Cascade)
-  
+
   @@unique([playlistId, songId])
   @@index([playlistId])
   @@index([songId])
+}
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  authToken    String?
+  isAdmin      Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([email])
 }

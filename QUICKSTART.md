@@ -14,8 +14,8 @@ make setup
 
 **OU** manualmente:
 ```bash
-docker-compose up --build -d
-docker-compose exec backend npx prisma migrate dev --name init
+docker compose up --build -d
+docker compose exec backend npx prisma migrate dev --name init
 ```
 
 ### 2. Acessar a Aplicação
@@ -111,7 +111,7 @@ sudo systemctl start docker
 ```
 
 ### Porta já em uso
-Mude as portas no `docker-compose.yml`:
+Mude as portas no `docker compose.yml`:
 ```yaml
 ports:
   - "3003:3002"  # Backend
@@ -120,7 +120,7 @@ ports:
 
 ### Banco não criado
 ```bash
-docker-compose exec backend npx prisma migrate dev --name init
+docker compose exec backend npx prisma migrate dev --name init
 ```
 
 ### Frontend não carrega

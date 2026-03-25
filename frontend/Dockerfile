@@ -15,5 +15,5 @@ COPY . .
 # Expor porta do Vite
 EXPOSE 5173
 
-# Comando padrão (será sobrescrito no docker-compose)
+# Comando padrão (será sobrescrito no docker compose)
 CMD ["npm", "run", "dev"]

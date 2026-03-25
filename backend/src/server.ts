@@ -4,6 +4,7 @@ import songRoutes from './routes/songRoutes.js';
 import playlistRoutes from './routes/playlistRoutes.js';
 import pdfRoutes from './routes/pdfRoutes.js';
 import ocrRoutes from './routes/ocrRoutes.js';
+import authRoutes from './routes/authRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT || 3002;
@@ -14,6 +15,7 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
+app.use('/api/auth', authRoutes);
 app.use('/api/songs', songRoutes);
 app.use('/api/playlists', playlistRoutes);
 app.use('/api/pdf', pdfRoutes);

@@ -98,7 +98,7 @@ cifras-musicas/
 │   ├── Dockerfile
 │   └── package.json
 │
-├── docker-compose.yml            # Orquestração
+├── docker compose.yml            # Orquestração
 ├── Makefile                      # Comandos facilitados
 ├── setup.sh                      # Setup automático
 │
@@ -169,8 +169,8 @@ make setup
 
 ### Opção 3: Manual
 ```bash
-docker-compose up --build -d
-docker-compose exec backend npx prisma migrate dev --name init
+docker compose up --build -d
+docker compose exec backend npx prisma migrate dev --name init
 ```
 
 **Acesse:**

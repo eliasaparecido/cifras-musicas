@@ -65,11 +65,10 @@ function isChordLine(line: string): boolean {
   // Linha deve ter pelo menos 1 palavra
   if (words.length === 0) return false;
   
-  // Todas as palavras devem ser acordes E pelo menos uma deve ter mais de 1 caractere
-  const hasComplexChord = words.some(w => w.length > 1);
+  // Todas as palavras da linha devem ser acordes
   const allChords = words.every(word => chordPattern.test(word));
-  
-  return allChords && hasComplexChord;
+
+  return allChords;
 }
 
 /**
