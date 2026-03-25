@@ -33,18 +33,18 @@ export default function RichTextEditor({ value, onChange, placeholder, disabled 
     onUpdate: ({ editor }) => {
       // Pegar HTML do editor
       let html = editor.getHTML();
-      
+
       console.log('=== RichTextEditor onUpdate ===');
       console.log('HTML original:', html);
-      
+
       // Preservar espaços múltiplos convertendo para &nbsp;
       // Converter sequências de 2+ espaços para &nbsp;
       html = html.replace(/ {2,}/g, (match) => {
         return '&nbsp;'.repeat(match.length);
       });
-      
+
       console.log('HTML após conversão:', html);
-      
+
       onChange(html);
     },
     editorProps: {
@@ -71,19 +71,19 @@ export default function RichTextEditor({ value, onChange, placeholder, disabled 
           const { state } = view;
           const { selection } = state;
           const { $from } = selection;
-          
+
           // Pegar texto antes do cursor
           const textBefore = $from.parent.textContent.substring(0, $from.parentOffset);
-          
+
           // Se o último caractere é um espaço, inserir &nbsp; ao invés de espaço normal
           if (textBefore.endsWith(' ') || textBefore.endsWith('\u00A0')) {
             event.preventDefault();
-            
+
             // Inserir non-breaking space usando HTML
             const { tr } = state;
             const nbspNode = state.schema.text('\u00A0');
             view.dispatch(tr.replaceSelectionWith(nbspNode, false));
-            
+
             return true;
           }
         }
@@ -98,14 +98,14 @@ export default function RichTextEditor({ value, onChange, placeholder, disabled 
       console.log('=== RichTextEditor useEffect ===');
       console.log('Value recebido:', value);
       console.log('HTML atual do editor:', editor.getHTML());
-      
+
       // Converter &nbsp; de volta para espaços non-breaking (U+00A0) ao carregar no editor
       // Isso permite que o editor mostre e mantenha os espaços
       let content = value || '';
-      
+
       // Manter &nbsp; como está para o editor processar corretamente
       editor.commands.setContent(content, { emitUpdate: false });
-      
+
       console.log('HTML após setContent:', editor.getHTML());
     }
   }, [value, editor]);
@@ -122,33 +122,30 @@ export default function RichTextEditor({ value, onChange, placeholder, disabled 
           type="button"
           onClick={() => editor.chain().focus().toggleBold().run()}
           disabled={disabled}
-          className={`p-1.5 hover:bg-gray-200 rounded transition-colors disabled:opacity-50 ${
-            editor.isActive('bold') ? 'bg-gray-300' : ''
-          }`}
+          className={`p-1.5 hover:bg-gray-200 rounded transition-colors disabled:opacity-50 ${editor.isActive('bold') ? 'bg-gray-300' : ''
+            }`}
           title="Negrito (Ctrl+B)"
         >
           <Bold size={18} />
         </button>
-        
+
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleItalic().run()}
           disabled={disabled}
-          className={`p-1.5 hover:bg-gray-200 rounded transition-colors disabled:opacity-50 ${
-            editor.isActive('italic') ? 'bg-gray-300' : ''
-          }`}
+          className={`p-1.5 hover:bg-gray-200 rounded transition-colors disabled:opacity-50 ${editor.isActive('italic') ? 'bg-gray-300' : ''
+            }`}
           title="Itálico (Ctrl+I)"
         >
           <Italic size={18} />
         </button>
-        
+
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleUnderline().run()}
           disabled={disabled}
-          className={`p-1.5 hover:bg-gray-200 rounded transition-colors disabled:opacity-50 ${
-            editor.isActive('underline') ? 'bg-gray-300' : ''
-          }`}
+          className={`p-1.5 hover:bg-gray-200 rounded transition-colors disabled:opacity-50 ${editor.isActive('underline') ? 'bg-gray-300' : ''
+            }`}
           title="Sublinhado (Ctrl+U)"
         >
           <UnderlineIcon size={18} />
@@ -160,7 +157,7 @@ export default function RichTextEditor({ value, onChange, placeholder, disabled 
           Dica: Selecione o texto e use os botões ou <b>Ctrl+B</b> para negrito, <i>Ctrl+I</i> para itálico
         </div>
       </div>
-      
+
       {/* Editor */}
       <div className="relative">
         {editor.isEmpty && placeholder && (
@@ -170,7 +167,7 @@ export default function RichTextEditor({ value, onChange, placeholder, disabled 
         )}
         <EditorContent editor={editor} />
       </div>
-      
+
       <style>{`
         .ProseMirror {
           min-height: 300px;

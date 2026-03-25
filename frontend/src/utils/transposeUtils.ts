@@ -32,7 +32,7 @@ const ENHARMONIC_EQUIVALENTS: Record<string, string> = {
  */
 export function stripHtml(html: string): string {
   if (!html) return '';
-  
+
   let text = html
     .replace(/<\/p>/gi, '\n')
     .replace(/<p>/gi, '')
@@ -43,7 +43,7 @@ export function stripHtml(html: string): string {
     .replace(/&gt;/g, '>')
     .replace(/&amp;/g, '&')
     .replace(/&quot;/g, '"');
-  
+
   return text.trim();
 }
 
@@ -55,16 +55,16 @@ export function stripHtml(html: string): string {
  */
 export function isChord(word: string): boolean {
   const trimmed = word.trim();
-  
+
   // Não pode ser vazio
   if (!trimmed) return false;
-  
+
   // Deve ter pelo menos 1 caractere
   if (trimmed.length === 0) return false;
-  
+
   // Padrão de acorde: DEVE começar com A-G MAIÚSCULO
   const chordPattern = /^[A-G][#b]?(?:m|maj|min|dim|aug|sus|add)?[0-9]*(?:\/[A-G][#b]?)?$/;
-  
+
   return chordPattern.test(trimmed);
 }
 
@@ -74,12 +74,12 @@ export function isChord(word: string): boolean {
 export function isChordLine(line: string): boolean {
   const trimmed = line.trim();
   if (!trimmed) return false;
-  
+
   const words = trimmed.split(/\s+/);
-  
+
   // Linha deve ter pelo menos 1 palavra
   if (words.length === 0) return false;
-  
+
   // Todas as palavras da linha devem ser acordes
   const allChords = words.every(word => isChord(word));
 
@@ -110,24 +110,24 @@ function toExternalFormat(note: string): string {
  */
 function normalizeNote(note: string): string {
   const internal = toInternalFormat(note);
-  
+
   // Se já está na escala de sustenidos, retorna
   if (NOTES_SHARP.includes(internal)) {
     return internal;
   }
-  
+
   // Se está na escala de bemóis, converte para sustenido equivalente
   if (NOTES_FLAT.includes(internal)) {
     return ENHARMONIC_EQUIVALENTS[internal] || internal;
   }
-  
+
   // Trata casos especiais (E#, Fb, B#, Cb)
   if (ENHARMONIC_EQUIVALENTS[internal]) {
     const equivalent = ENHARMONIC_EQUIVALENTS[internal];
     // Recursivamente normaliza para garantir que está na escala de sustenidos
     return normalizeNote(equivalent);
   }
-  
+
   return internal;
 }
 
@@ -141,15 +141,15 @@ function transposeNote(note: string, semitones: number, preferFlat: boolean = fa
   // Normaliza a nota para sustenido
   const normalized = normalizeNote(note);
   const index = NOTES_SHARP.indexOf(normalized);
-  
+
   if (index === -1) {
     console.warn(`Nota inválida para transposição: ${note}`);
     return note;
   }
-  
+
   // Calcula o novo índice (garante que seja positivo)
   const newIndex = ((index + semitones) % 12 + 12) % 12;
-  
+
   // Retorna na notação preferida (sustenido ou bemol)
   const result = preferFlat ? NOTES_FLAT[newIndex] : NOTES_SHARP[newIndex];
   return toExternalFormat(result);
@@ -165,11 +165,11 @@ function transposeNote(note: string, semitones: number, preferFlat: boolean = fa
 function parseChord(chord: string): { root: string; suffix: string; bass: string | null } {
   // Regex para capturar: nota base (com # ou b) + sufixo + baixo opcional (após /)
   const match = chord.match(/^([A-G][#b]?)([^\/]*)(?:\/([A-G][#b]?))?$/i);
-  
+
   if (!match) {
     return { root: chord, suffix: '', bass: null };
   }
-  
+
   return {
     root: match[1],
     suffix: match[2] || '',
@@ -185,19 +185,19 @@ function parseChord(chord: string): { root: string; suffix: string; bass: string
  */
 export function transposeChordBySemitones(chord: string, semitones: number, preferFlat: boolean = false): string {
   const { root, suffix, bass } = parseChord(chord);
-  
+
   // Transpõe a nota raiz
   const newRoot = transposeNote(root, semitones, preferFlat);
-  
+
   // Transpõe o baixo se existir
   const newBass = bass ? transposeNote(bass, semitones, preferFlat) : null;
-  
+
   // Reconstrói o acorde
   let result = newRoot + suffix;
   if (newBass) {
     result += '/' + newBass;
   }
-  
+
   return result;
 }
 
@@ -210,15 +210,15 @@ export function getSemitonesDifference(fromKey: string, toKey: string): number {
   // Remove sufixo de acorde menor ('m') se presente
   const fromNote = normalizeNote(fromKey.replace(/m$/i, ''));
   const toNote = normalizeNote(toKey.replace(/m$/i, ''));
-  
+
   const fromIndex = NOTES_SHARP.indexOf(fromNote);
   const toIndex = NOTES_SHARP.indexOf(toNote);
-  
+
   if (fromIndex === -1 || toIndex === -1) {
     console.warn(`Tom inválido para cálculo de diferença: ${fromKey} -> ${toKey}`);
     return 0;
   }
-  
+
   // Calcula a diferença (sempre positiva, no sentido horário da circunferência)
   return (toIndex - fromIndex + 12) % 12;
 }
@@ -238,29 +238,29 @@ function shouldPreferFlats(toKey: string): boolean {
  */
 export function transposeLyrics(lyrics: string, fromKey: string, toKey: string): string {
   const semitones = getSemitonesDifference(fromKey, toKey);
-  
+
   if (semitones === 0) {
     return lyrics;
   }
-  
+
   const preferFlat = shouldPreferFlats(toKey);
   const lines = lyrics.split("\n");
   const result: string[] = [];
 
   for (const line of lines) {
     const trimmed = line.trim();
-    
+
     if (!trimmed) {
       result.push(line);
       continue;
     }
-    
+
     // Verificar se é uma linha de acordes
     if (isChordLine(line)) {
       // É linha de acordes - transpor
       const words = line.split(/(\s+)/);
       let transposedLine = '';
-      
+
       for (const word of words) {
         if (isChord(word)) {
           transposedLine += transposeChordBySemitones(word.trim(), semitones, preferFlat);
@@ -268,7 +268,7 @@ export function transposeLyrics(lyrics: string, fromKey: string, toKey: string):
           transposedLine += word;
         }
       }
-      
+
       result.push(transposedLine);
     } else {
       // Não é linha de acordes - manter como está
@@ -292,12 +292,12 @@ export function renderLyricsAsHtml(lyrics: string): string {
       result.push('<br/>');
       continue;
     }
-    
+
     if (isChordLine(line)) {
       // Linha de acordes - coloca em negrito
       const words = line.split(/(\s+)/);
       let htmlLine = '';
-      
+
       for (const word of words) {
         if (isChord(word)) {
           htmlLine += `<strong>${word}</strong>`;
@@ -306,7 +306,7 @@ export function renderLyricsAsHtml(lyrics: string): string {
           htmlLine += word.replace(/ /g, '&nbsp;');
         }
       }
-      
+
       result.push(htmlLine);
     } else {
       // Linha de letra - texto normal
@@ -334,9 +334,9 @@ export function getAllKeys(): string[] {
  */
 export function isValidNote(note: string): boolean {
   const internal = toInternalFormat(note);
-  return NOTES_SHARP.includes(internal) || 
-         NOTES_FLAT.includes(internal) ||
-         Object.prototype.hasOwnProperty.call(ENHARMONIC_EQUIVALENTS, internal);
+  return NOTES_SHARP.includes(internal) ||
+    NOTES_FLAT.includes(internal) ||
+    Object.prototype.hasOwnProperty.call(ENHARMONIC_EQUIVALENTS, internal);
 }
 
 /**

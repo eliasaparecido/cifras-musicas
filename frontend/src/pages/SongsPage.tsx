@@ -51,20 +51,20 @@ export default function SongsPage() {
       } else {
         setLoadingMore(true);
       }
-      
+
       const currentSkip = reset ? 0 : skip;
-      const data = await songService.getAll({ 
-        search: search || undefined, 
+      const data = await songService.getAll({
+        search: search || undefined,
         skip: currentSkip,
-        take: ITEMS_PER_PAGE 
+        take: ITEMS_PER_PAGE
       });
-      
+
       if (reset) {
         setSongs(data);
       } else {
         setSongs(prev => [...prev, ...data]);
       }
-      
+
       setHasMore(data.length === ITEMS_PER_PAGE);
       if (!reset) {
         setSkip(currentSkip + ITEMS_PER_PAGE);
@@ -192,7 +192,7 @@ export default function SongsPage() {
               </div>
             </div>
           ))}
-          
+
           {/* Scroll Trigger */}
           <div ref={observerTarget} className="py-4 text-center">
             {loadingMore && <p className="text-gray-600">Carregando mais...</p>}

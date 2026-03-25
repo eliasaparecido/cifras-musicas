@@ -116,9 +116,8 @@ export default function PlaylistDetailPage() {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `${playlist?.name || "playlist"}${
-        showChords ? "" : "-sem-cifras"
-      }.pdf`;
+      a.download = `${playlist?.name || "playlist"}${showChords ? "" : "-sem-cifras"
+        }.pdf`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
@@ -303,11 +302,10 @@ export default function PlaylistDetailPage() {
                           setSelectedSongId(song.id);
                           setSongKey(song.originalKey);
                         }}
-                        className={`px-3 py-2 cursor-pointer hover:bg-blue-50 ${
-                          selectedSongId === song.id
+                        className={`px-3 py-2 cursor-pointer hover:bg-blue-50 ${selectedSongId === song.id
                             ? "bg-blue-100 font-semibold"
                             : ""
-                        }`}
+                          }`}
                       >
                         {song.title} - {song.artist}
                       </div>
@@ -320,10 +318,10 @@ export default function PlaylistDetailPage() {
                       song.artist.toLowerCase().includes(query)
                     );
                   }).length === 0 && (
-                    <div className="px-3 py-2 text-gray-500 text-center">
-                      Nenhuma música encontrada
-                    </div>
-                  )}
+                      <div className="px-3 py-2 text-gray-500 text-center">
+                        Nenhuma música encontrada
+                      </div>
+                    )}
                 </div>
               </div>
               <div className="flex gap-4">
@@ -375,9 +373,8 @@ export default function PlaylistDetailPage() {
                   onDragOver={(e) => canManagePlaylist && handleDragOver(e)}
                   onDrop={() => canManagePlaylist && handleDrop(index)}
                   onDragEnd={() => canManagePlaylist && handleDragEnd()}
-                  className={`flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 bg-gray-50 rounded hover:bg-gray-100 ${canManagePlaylist ? "cursor-move" : "cursor-default"} transition-all gap-3 ${
-                    draggedIndex === index ? "opacity-50 scale-95" : ""
-                  }`}
+                  className={`flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 bg-gray-50 rounded hover:bg-gray-100 ${canManagePlaylist ? "cursor-move" : "cursor-default"} transition-all gap-3 ${draggedIndex === index ? "opacity-50 scale-95" : ""
+                    }`}
                 >
                   <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
                     <span className={`text-gray-400 flex-shrink-0 ${canManagePlaylist ? "hover:text-gray-600 cursor-grab active:cursor-grabbing" : ""}`}>

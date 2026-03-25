@@ -245,7 +245,7 @@ function parseHtmlStructure(html: string): Array<{ type: 'tag' | 'text', content
   const structure: Array<{ type: 'tag' | 'text', content: string }> = [];
   const regex = /(<[^>]+>|[^<]+)/g;
   let match;
-  
+
   while ((match = regex.exec(html)) !== null) {
     if (match[0].startsWith('<')) {
       structure.push({ type: 'tag', content: match[0] });
@@ -253,7 +253,7 @@ function parseHtmlStructure(html: string): Array<{ type: 'tag' | 'text', content
       structure.push({ type: 'text', content: match[0] });
     }
   }
-  
+
   return structure;
 }
 
@@ -269,18 +269,18 @@ function transposeChordWithHtml(
   if (!chordHtml.includes('<')) {
     return transposeChord(chordHtml, semitones, preferFlat);
   }
-  
+
   // Extrai o texto puro do acorde
   const plainChord = stripHtmlFromText(chordHtml);
-  
+
   // Transpõe o acorde
   const transposedChord = transposeChord(plainChord, semitones, preferFlat);
-  
+
   // Se o acorde transposto tem o mesmo comprimento, substitui caractere por caractere
   if (plainChord.length === transposedChord.length) {
     let result = chordHtml;
     let plainIndex = 0;
-    
+
     for (let i = 0; i < transposedChord.length; i++) {
       // Encontra a próxima posição de texto (não tag) no HTML
       while (plainIndex < result.length && result[plainIndex] === '<') {
@@ -289,21 +289,21 @@ function transposeChordWithHtml(
         if (tagEnd === -1) break;
         plainIndex = tagEnd + 1;
       }
-      
+
       if (plainIndex < result.length) {
         result = result.substring(0, plainIndex) + transposedChord[i] + result.substring(plainIndex + 1);
         plainIndex++;
       }
     }
-    
+
     return result;
   }
-  
+
   // Se o comprimento mudou, reconstrói mantendo apenas as tags de formatação (não de posição)
   const structure = parseHtmlStructure(chordHtml);
   let transposedIndex = 0;
   let resultParts: string[] = [];
-  
+
   for (const part of structure) {
     if (part.type === 'tag') {
       // Mantém tags de formatação (strong, em, u, b, i)
@@ -318,12 +318,12 @@ function transposeChordWithHtml(
       transposedIndex += textLength;
     }
   }
-  
+
   // Se sobraram caracteres do acorde transposto, adiciona no final
   if (transposedIndex < transposedChord.length) {
     resultParts.push(transposedChord.substring(transposedIndex));
   }
-  
+
   return resultParts.join('');
 }
 

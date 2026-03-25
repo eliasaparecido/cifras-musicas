@@ -6,7 +6,7 @@ export default function CreatePlaylistPage() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const isEditing = Boolean(id);
-  
+
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -23,7 +23,7 @@ export default function CreatePlaylistPage() {
 
   const loadPlaylist = async () => {
     if (!id) return;
-    
+
     try {
       setLoading(true);
       const playlist = await playlistService.getById(id);
@@ -42,7 +42,7 @@ export default function CreatePlaylistPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.name.trim()) {
       setError('Nome da playlist é obrigatório');
       return;

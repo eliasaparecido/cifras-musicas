@@ -29,7 +29,7 @@ router.get("/", async (req, res) => {
         SELECT * FROM Song
         WHERE LOWER(title) LIKE ${"%" + searchLower + "%"}
            OR LOWER(artist) LIKE ${"%" + searchLower + "%"}
-        ORDER BY createdAt DESC
+        ORDER BY createdAt DESC, id DESC
         LIMIT ${parseInt(take as string, 10)}
         OFFSET ${parseInt(skip as string, 10)}
       `;
@@ -38,7 +38,7 @@ router.get("/", async (req, res) => {
       songs = await prisma.$queryRaw`
         SELECT * FROM Song
         WHERE LOWER(artist) LIKE ${"%" + artistLower + "%"}
-        ORDER BY createdAt DESC
+        ORDER BY createdAt DESC, id DESC
         LIMIT ${parseInt(take as string, 10)}
         OFFSET ${parseInt(skip as string, 10)}
       `;
@@ -46,7 +46,7 @@ router.get("/", async (req, res) => {
       songs = await prisma.song.findMany({
         skip: parseInt(skip as string, 10),
         take: parseInt(take as string, 10),
-        orderBy: { createdAt: "desc" },
+        orderBy: [{ createdAt: "desc" }, { id: "desc" }],
       });
     }
 

@@ -43,38 +43,35 @@ export default function Layout({ children }: LayoutProps) {
               <Music size={28} className="md:w-8 md:h-8" />
               <h1 className="text-xl md:text-2xl font-bold">Cifras Musicais</h1>
             </Link>
-            
+
             {/* Desktop Navigation */}
             <nav className="hidden md:flex space-x-6">
               <Link
                 to="/"
-                className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
-                  isActive('/') && location.pathname === '/'
+                className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${isActive('/') && location.pathname === '/'
                     ? 'bg-primary-600'
                     : 'hover:bg-primary-600'
-                }`}
+                  }`}
               >
                 <Home size={20} />
                 <span>Início</span>
               </Link>
               <Link
                 to="/songs"
-                className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
-                  isActive('/songs')
+                className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${isActive('/songs')
                     ? 'bg-primary-600'
                     : 'hover:bg-primary-600'
-                }`}
+                  }`}
               >
                 <Music size={20} />
                 <span>Músicas</span>
               </Link>
               <Link
                 to="/playlists"
-                className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
-                  isActive('/playlists')
+                className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${isActive('/playlists')
                     ? 'bg-primary-600'
                     : 'hover:bg-primary-600'
-                }`}
+                  }`}
               >
                 <List size={20} />
                 <span>Playlists</span>
@@ -127,11 +124,10 @@ export default function Layout({ children }: LayoutProps) {
               <Link
                 to="/"
                 onClick={() => setMobileMenuOpen(false)}
-                className={`flex items-center space-x-2 px-4 py-3 rounded-lg transition-colors ${
-                  isActive('/') && location.pathname === '/'
+                className={`flex items-center space-x-2 px-4 py-3 rounded-lg transition-colors ${isActive('/') && location.pathname === '/'
                     ? 'bg-primary-600'
                     : 'hover:bg-primary-600'
-                }`}
+                  }`}
               >
                 <Home size={20} />
                 <span>Início</span>
@@ -139,11 +135,10 @@ export default function Layout({ children }: LayoutProps) {
               <Link
                 to="/songs"
                 onClick={() => setMobileMenuOpen(false)}
-                className={`flex items-center space-x-2 px-4 py-3 rounded-lg transition-colors ${
-                  isActive('/songs')
+                className={`flex items-center space-x-2 px-4 py-3 rounded-lg transition-colors ${isActive('/songs')
                     ? 'bg-primary-600'
                     : 'hover:bg-primary-600'
-                }`}
+                  }`}
               >
                 <Music size={20} />
                 <span>Músicas</span>
@@ -151,11 +146,10 @@ export default function Layout({ children }: LayoutProps) {
               <Link
                 to="/playlists"
                 onClick={() => setMobileMenuOpen(false)}
-                className={`flex items-center space-x-2 px-4 py-3 rounded-lg transition-colors ${
-                  isActive('/playlists')
+                className={`flex items-center space-x-2 px-4 py-3 rounded-lg transition-colors ${isActive('/playlists')
                     ? 'bg-primary-600'
                     : 'hover:bg-primary-600'
-                }`}
+                  }`}
               >
                 <List size={20} />
                 <span>Playlists</span>

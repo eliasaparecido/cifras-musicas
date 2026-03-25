@@ -27,39 +27,39 @@ router.get("/", async (req, res) => {
 
     const playlists = search
       ? await (async () => {
-      const searchLower = (search as string).toLowerCase();
-      const playlistIds: Array<{ id: string }> = await prisma.$queryRaw`
+        const searchLower = (search as string).toLowerCase();
+        const playlistIds: Array<{ id: string }> = await prisma.$queryRaw`
         SELECT id FROM Playlist
         WHERE LOWER(name) LIKE ${"%" + searchLower + "%"}
            OR LOWER(description) LIKE ${"%" + searchLower + "%"}
-        ORDER BY createdAt DESC
+          ORDER BY createdAt DESC, id DESC
         LIMIT ${parseInt(take as string, 10)}
         OFFSET ${parseInt(skip as string, 10)}
       `;
 
-      if (playlistIds.length > 0) {
-        return prisma.playlist.findMany({
-          where: {
-            id: { in: playlistIds.map((p) => p.id) },
-          },
-          include: {
-            songs: {
-              include: {
-                song: true,
-              },
-              orderBy: { order: "asc" },
+        if (playlistIds.length > 0) {
+          return prisma.playlist.findMany({
+            where: {
+              id: { in: playlistIds.map((p) => p.id) },
             },
-          },
-          orderBy: { createdAt: "desc" },
-        });
-      }
+            include: {
+              songs: {
+                include: {
+                  song: true,
+                },
+                orderBy: { order: "asc" },
+              },
+            },
+              orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+          });
+        }
 
-      return [];
-    })()
+        return [];
+      })()
       : await prisma.playlist.findMany({
         skip: parseInt(skip as string, 10),
         take: parseInt(take as string, 10),
-        orderBy: { createdAt: "desc" },
+          orderBy: [{ createdAt: "desc" }, { id: "desc" }],
         include: {
           songs: {
             include: {

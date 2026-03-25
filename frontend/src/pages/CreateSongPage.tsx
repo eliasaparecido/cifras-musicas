@@ -48,11 +48,11 @@ export default function CreateSongPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     console.log('=== CreateSongPage handleSubmit ===');
     console.log('FormData sendo enviado:', formData);
     console.log('Lyrics:', formData.lyrics);
-    
+
     if (!formData.title || !formData.artist || !formData.lyrics) {
       alert('Preencha todos os campos obrigatórios');
       return;
@@ -82,7 +82,7 @@ export default function CreateSongPage() {
 
     try {
       setUploadingImage(true);
-      
+
       const formDataUpload = new FormData();
       formDataUpload.append('image', file);
 
@@ -217,7 +217,7 @@ export default function CreateSongPage() {
               <div className="text-blue-600 mt-2">Eb&nbsp;&nbsp;&nbsp;&nbsp;F&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Bb</div>
               <div>MÃOS QUE SE ELEVAM A TI, Ó SENHOR</div>
             </div>
-            
+
             <p className="font-semibold mt-3 mb-1 text-purple-600">✨ Dicas:</p>
             <p className="text-gray-600">• Acordes em uma linha, letra na linha abaixo</p>
             <p className="text-gray-600">• Use espaços para alinhar os acordes</p>

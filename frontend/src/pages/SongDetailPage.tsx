@@ -13,7 +13,7 @@ const ALL_KEYS = [...KEYS, ...MINOR_KEYS];
 // Componente para renderizar letras (força re-render)
 function LyricsDisplay({ html }: { html: string }) {
   return (
-    <div 
+    <div
       className="lyrics-display"
       dangerouslySetInnerHTML={{ __html: html }}
     />
@@ -47,22 +47,22 @@ export default function SongDetailPage() {
     try {
       setLoading(true);
       const data = await songService.getById(songId);
-      
+
       // Limpar HTML de dados antigos do banco
       const cleanLyrics = stripHtml(data.lyrics);
-      
+
       // Atualizar objeto da música com letra limpa
       const cleanSong = { ...data, lyrics: cleanLyrics };
       setSong(cleanSong);
-      
+
       const targetKey = key || data.originalKey;
       setCurrentKey(targetKey);
-      
+
       // Transpor se necessário
       const transposedLyrics = key && key !== data.originalKey
         ? transposeLyrics(cleanLyrics, data.originalKey, key)
         : cleanLyrics;
-      
+
       // Renderizar como HTML para exibição
       setDisplayLyrics(renderLyricsAsHtml(transposedLyrics));
     } catch (error) {
