@@ -13,6 +13,9 @@ export default defineConfig({
   server: {
     host: true,
     port: 5173,
+    allowedHosts: [
+      'cifras-musicas.codelabai.com.br',
+    ],
     watch: {
       usePolling: true,
     },
